@@ -1,6 +1,7 @@
 import cv2
 import mediapipe as mp
 from mediapipe.tasks import python
+from body_parts.body_parts import *
 
 # Initialize MediaPipe Pose
 mp_pose = mp.solutions.pose
@@ -26,6 +27,13 @@ while cap.isOpened():
 
     # Draw the landmarks on the frame
     if results.pose_landmarks:
+
+        body_parts = build_body_parts(results.pose_landmarks)
+
+        torso = body_parts[BodyParts.TORSO]
+        cv2.putText(frame, f"Torso vector: {torso.vector}", (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 1)
+
         mp_drawing.draw_landmarks(
             frame,
             results.pose_landmarks,
