@@ -6,77 +6,105 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import numpy as np
 
+FPS = 15
+TIMESTAMP_STEP = int(1000 / FPS)  # in milliseconds
+timestamp = 0
+
 
 def draw_landmarks_on_image(rgb_image, detection_result):
-  pose_landmarks_list = detection_result.pose_landmarks
-  annotated_image = np.copy(rgb_image)
+    pose_landmarks_list = detection_result.pose_landmarks
+    annotated_image = np.copy(rgb_image)
 
-  # Loop through the detected poses to visualize.
-  for idx in range(len(pose_landmarks_list)):
-    pose_landmarks = pose_landmarks_list[idx]
+    for idx in range(len(pose_landmarks_list)):
+        pose_landmarks = pose_landmarks_list[idx]
 
-    # Draw the pose landmarks.
-    pose_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
-    pose_landmarks_proto.landmark.extend([
-      landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in pose_landmarks
-    ])
-    solutions.drawing_utils.draw_landmarks(
-      annotated_image,
-      pose_landmarks_proto,
-      solutions.pose.POSE_CONNECTIONS,
-      solutions.drawing_styles.get_default_pose_landmarks_style())
-  return annotated_image
+        # Convert to protobuf
+        pose_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
+        pose_landmarks_proto.landmark.extend([
+            landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z)
+            for landmark in pose_landmarks
+        ])
 
-while True:
-    cap = cv2.VideoCapture(0)  # 0 = default webcam
+        # Draw
+        solutions.drawing_utils.draw_landmarks(
+            annotated_image,
+            pose_landmarks_proto,
+            solutions.pose.POSE_CONNECTIONS,
+            solutions.drawing_styles.get_default_pose_landmarks_style()
+        )
+    return annotated_image
+
+
+# Global variable to hold last annotated frame
+annotated_frame = None
+
+
+# Callback for live stream results
+def result_callback(result: vision.PoseLandmarkerResult, output_image: mp.Image, timestamp_ms: int):
+    if timestamp_ms > timestamp + TIMESTAMP_STEP * FPS:
+        # Skip frames that are too far behind
+        return
+
+    global annotated_frame
+    rgb_view = output_image.numpy_view()
+    annotated_frame = draw_landmarks_on_image(rgb_view, result)
+
+
+def main():
+    global annotated_frame
+
+    # Open webcam
+    cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-    cap.set(cv2.CAP_PROP_FPS, 30)
+    cap.set(cv2.CAP_PROP_FPS, FPS)
 
     if not cap.isOpened():
         print("Error: Could not open camera.")
-        exit(1)
+        return
 
+    # Create PoseLandmarker in LIVE_STREAM mode
+    base_options = python.BaseOptions(
+        model_asset_path="model/pose_landmarker_heavy.task",
+        # delegate=python.BaseOptions.Delegate.GPU
+    )
+
+    options = vision.PoseLandmarkerOptions(
+        base_options=base_options,
+        running_mode=vision.RunningMode.LIVE_STREAM,
+        result_callback=result_callback,
+        output_segmentation_masks=False,
+        num_poses=5
+    )
+    detector = vision.PoseLandmarker.create_from_options(options)
+
+    global timestamp
     while True:
         ret, frame = cap.read()
         if not ret:
             print("Failed to grab frame")
-            exit(1)
+            break
 
-        # STEP 2: Create an PoseLandmarker object.
-        base_options = python.BaseOptions(model_asset_path='model/pose_landmarker_heavy.task')
-        options = vision.PoseLandmarkerOptions(
-            base_options=base_options,
-            output_segmentation_masks=True,
-            num_poses=5,
-        )
-        detector = vision.PoseLandmarker.create_from_options(options)
-
-        # Convert OpenCV frame (BGR → RGB)
+        # BGR → RGB
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        # Convert numpy array → MediaPipe Image
-        image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
+        # Wrap frame in MediaPipe Image
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
 
-        # STEP 4: Detect pose landmarks from the input image.
-        detection_result = detector.detect(image)
+        # Send async frame to detector
+        detector.detect_async(mp_image, timestamp)
+        timestamp += TIMESTAMP_STEP
 
-        # STEP 5: Process the detection result. In this case, visualize it.
-        annotated_image = draw_landmarks_on_image(image.numpy_view(), detection_result)
-        cv2.imshow("Mediapipe Pose", cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
+        # Show annotated frame if available
+        if annotated_frame is not None:
+            cv2.imshow("Mediapipe Pose Live", cv2.cvtColor(annotated_frame, cv2.COLOR_RGB2BGR))
 
-        # segmentation_mask = detection_result.segmentation_masks[0].numpy_view()
-        # visualized_mask = np.repeat(segmentation_mask[:, :, np.newaxis], 3, axis=2) * 255
-        # cv2.imshow("2", visualized_mask)
-
-        # cv2.imshow("Camera Feed", frame)
-
-        # Press 'q' to quit
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(1) & 0xFF == ord("q"):
             break
 
     cap.release()
     cv2.destroyAllWindows()
 
+
+if __name__ == "__main__":
+    main()
