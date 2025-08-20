@@ -1,18 +1,20 @@
+from enum import Enum
+
 from mediapipe.python.solutions.pose import PoseLandmark
 
-from . import *
+from body_parts.math_utils import Vec3
 
 
 class Arm:
     def __init__(self, shoulder: Vec3, elbow: Vec3, wrist: Vec3):
-        self.upper = BodyPart(shoulder, elbow)
-        self.lower = BodyPart(elbow, wrist)
+        self.first = BodyPart(shoulder, elbow)
+        self.second = BodyPart(elbow, wrist)
 
 
 class Leg:
     def __init__(self, hip: Vec3, knee: Vec3, ankle: Vec3):
-        self.upper = BodyPart(hip, knee)
-        self.lower = BodyPart(knee, ankle)
+        self.first = BodyPart(hip, knee)
+        self.second = BodyPart(knee, ankle)
 
 
 class Torso:
@@ -49,10 +51,10 @@ class Head:
         # Normal vector perpendicular to head plane
         self.vector = Vec3.cross(u, v).normalize()
 
-def build_body_parts(pose_landmarks):
+def build_body_parts(pose_landmarks, width, height):
     landmarks_dict = dict()
-    for idx, landmark in enumerate(pose_landmarks.landmark):
-        landmarks_dict[idx] = Vec3(landmark.x * 256, landmark.y * 256, landmark.z * 256)
+    for idx, landmark in enumerate(pose_landmarks):
+        landmarks_dict[idx] = Vec3(int(landmark.x * width), int(landmark.y * height), round(landmark.z, 3))
 
     body_parts = {
         BodyParts.LEFT_ARM: Arm(landmarks_dict[PoseLandmark.LEFT_SHOULDER],
@@ -79,10 +81,20 @@ def build_body_parts(pose_landmarks):
     return body_parts
 
 
+class BodyParts(Enum):
+    LEFT_ARM = "left_arm"
+    RIGHT_ARM = "right_arm"
+    LEFT_LEG = "left_leg"
+    RIGHT_LEG = "right_leg"
+    TORSO = "torso"
+    HEAD = "head"
 
 
-
-
-
-
-
+class BodyPart:
+    def __init__(self, start, end):
+        self.vector = (Vec3(end.x, start.y, end.z) - Vec3(start.x, end.y, start.z)).normalize()
+        self.center = Vec3(
+            int((start.x + end.x) / 2),
+            int((start.y + end.y) / 2),
+            (start.z + end.z) / 2
+        )
