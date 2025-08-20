@@ -1,3 +1,4 @@
+from typing import Any, Optional
 import cv2
 import mediapipe as mp
 from mediapipe import solutions
@@ -6,10 +7,12 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import numpy as np
 
-FPS = 15
-TIMESTAMP_STEP = int(1000 / FPS)  # in milliseconds
+FPS = 30
+TIMESTAMP_STEP = int(1000 / FPS)
 timestamp = 0
 
+# Global variable to hold last annotated frame
+annotated_frame: Optional[np.ndarray[Any, np.dtype[Any]]] = None
 
 def draw_landmarks_on_image(rgb_image, detection_result):
     pose_landmarks_list = detection_result.pose_landmarks
@@ -34,17 +37,8 @@ def draw_landmarks_on_image(rgb_image, detection_result):
         )
     return annotated_image
 
-
-# Global variable to hold last annotated frame
-annotated_frame = None
-
-
 # Callback for live stream results
 def result_callback(result: vision.PoseLandmarkerResult, output_image: mp.Image, timestamp_ms: int):
-    if timestamp_ms > timestamp + TIMESTAMP_STEP * FPS:
-        # Skip frames that are too far behind
-        return
-
     global annotated_frame
     rgb_view = output_image.numpy_view()
     annotated_frame = draw_landmarks_on_image(rgb_view, result)
@@ -63,10 +57,10 @@ def main():
         print("Error: Could not open camera.")
         return
 
-    # Create PoseLandmarker in LIVE_STREAM mode
+
     base_options = python.BaseOptions(
         model_asset_path="model/pose_landmarker_heavy.task",
-        # delegate=python.BaseOptions.Delegate.GPU
+        delegate=python.BaseOptions.Delegate.GPU
     )
 
     options = vision.PoseLandmarkerOptions(
@@ -96,8 +90,9 @@ def main():
         timestamp += TIMESTAMP_STEP
 
         # Show annotated frame if available
-        if annotated_frame is not None:
-            cv2.imshow("Mediapipe Pose Live", cv2.cvtColor(annotated_frame, cv2.COLOR_RGB2BGR))
+        frame_to_draw = annotated_frame
+        if frame_to_draw is not None:
+            cv2.imshow("Mediapipe Pose Live", cv2.cvtColor(frame_to_draw, cv2.COLOR_RGB2BGR))
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
