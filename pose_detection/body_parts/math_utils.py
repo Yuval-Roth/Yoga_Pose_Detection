@@ -22,35 +22,21 @@ class Vec3:
         return Vec3(self.x - other.x, self.y - other.y, self.z - other.z)
 
     def magnitude(self):
-        return math.sqrt(self.x ** 2 + self.y ** 2 + self.z ** 2)
+        return math.sqrt(self.x ** 2 + self.y ** 2)
 
     def normalize(self):
         mag = self.magnitude()
-        return Vec3(self.x / mag, self.y / mag, self.z / mag) if mag > 0 else Vec3(0, 0, 0)
+        return Vec3(self.x / mag, self.y / mag, self.z) if mag > 0 else Vec3(0, 0, 0)
 
     def __repr__(self):
-        return f"Vec3({self.x:.2f}, {self.y:.2f}, {self.z:.2f})"
+        return f"({self.x:.2f}, {self.y:.2f}, {self.z:.2f})"
+
 
     @staticmethod
-    def cross(v1, v2):
-        return Vec3(
-            v1.y * v2.z - v1.z * v2.y,
-            v1.z * v2.x - v1.x * v2.z,
-            v1.x * v2.y - v1.y * v2.x
-        )
-
-    @staticmethod
-    def cross2(v1,v2):
-        """
-        Calculate the 2D cross product of two vectors v1 and v2.
-        between x and y
-        """
-        return v1.x * v2.y - v1.y * v2.x
-
-    @staticmethod
-    def angle(v1, v2):
+    def angle2(v1, v2):
         """
         Calculate the angle in degrees between two vectors v1 and v2.
+        Based on x and y components only, ignoring z.
         """
         dot_product = v1.x * v2.x + v1.y * v2.y
         magnitude_v1 = v1.magnitude()

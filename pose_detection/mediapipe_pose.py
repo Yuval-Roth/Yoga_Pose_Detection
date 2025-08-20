@@ -10,6 +10,40 @@ import numpy as np
 from body_parts.body_parts import build_body_parts, BodyParts
 from body_parts.math_utils import Vec3
 
+def exactly_one(*args) -> bool:
+    """
+    Check if exactly one of the arguments is True.
+    """
+    return sum(args) == 1
+
+def is_warrior2(body_parts) -> bool:
+    """
+    Check if the body parts correspond to Warrior II pose.
+    """
+    right_arm = body_parts[BodyParts.RIGHT_ARM]
+    left_arm = body_parts[BodyParts.LEFT_ARM]
+    right_leg = body_parts[BodyParts.RIGHT_LEG]
+    left_leg = body_parts[BodyParts.LEFT_LEG]
+    torso = body_parts[BodyParts.TORSO]
+
+    # Check if arms are straight
+    right_straight = Vec3.angle2(right_arm.first.vector, right_arm.second.vector) < 40
+    left_straight = Vec3.angle2(left_arm.first.vector, left_arm.second.vector) < 40
+
+    # Check that the arms are 90 degrees from the torso
+    right_arm_angle = Vec3.angle2(torso.right.vector, right_arm.first.vector)
+    left_arm_angle = Vec3.angle2(torso.left.vector, left_arm.first.vector)
+    left_arm_perpendicular = abs(left_arm_angle - 90) < 15
+    right_arm_perpendicular = abs(right_arm_angle - 90) < 15
+
+    # Check that one leg is bent and the other is straight
+    right_leg_angle = Vec3.angle2(right_leg.first.vector, right_leg.second.vector)
+    left_leg_angle = Vec3.angle2(left_leg.first.vector, left_leg.second.vector)
+    one_bent = exactly_one(abs(right_leg_angle - 90) < 10, abs(left_leg_angle - 90) < 10)
+    one_straight = exactly_one(right_leg_angle < 10, left_leg_angle < 10)
+
+    return right_straight and left_straight and left_arm_perpendicular and right_arm_perpendicular and one_bent and one_straight
+
 FPS = 30
 TIMESTAMP_STEP = int(1000 / FPS)
 timestamp = 0
@@ -44,79 +78,28 @@ def draw_landmarks_on_image(rgb_image, detection_result):
 
         # Draw body parts vectors in the center of the body part
         cv2.putText(annotated_image,
-                f"({body_parts[BodyParts.RIGHT_ARM].first.vector})",
+                f"{body_parts[BodyParts.RIGHT_ARM].first.vector}",
                 (body_parts[BodyParts.RIGHT_ARM].first.center.x, body_parts[BodyParts.RIGHT_ARM].first.center.y),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
         cv2.putText(annotated_image,
-                f"({body_parts[BodyParts.RIGHT_ARM].second.vector})",
+                f"{body_parts[BodyParts.RIGHT_ARM].second.vector}",
                 (body_parts[BodyParts.RIGHT_ARM].second.center.x, body_parts[BodyParts.RIGHT_ARM].second.center.y),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
         cv2.putText(annotated_image,
-                f"({body_parts[BodyParts.LEFT_ARM].first.vector})",
+                f"{body_parts[BodyParts.LEFT_ARM].first.vector}",
                 (body_parts[BodyParts.LEFT_ARM].first.center.x, body_parts[BodyParts.LEFT_ARM].first.center.y),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
         cv2.putText(annotated_image,
-                f"({body_parts[BodyParts.LEFT_ARM].second.vector})",
+                f"{body_parts[BodyParts.LEFT_ARM].second.vector}",
                 (body_parts[BodyParts.LEFT_ARM].second.center.x, body_parts[BodyParts.LEFT_ARM].second.center.y),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
-        # put text at the top right corner
-        wrists_angle = Vec3.angle(body_parts[BodyParts.RIGHT_ARM].second.vector, body_parts[BodyParts.LEFT_ARM].second.vector)
-        wrists_parallel = wrists_angle < 15
-        cv2.putText(annotated_image,
-                    f"{"WRISTS PARALLEL" if wrists_parallel else ""}",
-                    (10, 30),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2
-        )
+        # check warrior2 pose
+        if is_warrior2(body_parts):
+            cv2.putText(annotated_image, "Warrior II Pose Detected", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        else:
+            cv2.putText(annotated_image, "Not Warrior II Pose", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
-
-        # # Extract arm landmarks
-        # if len(pose_landmarks) > 16:
-        #     # Right arm landmarks
-        #     right_shoulder = pose_landmarks[12]
-        #     right_elbow = pose_landmarks[14]
-        #     right_wrist = pose_landmarks[16]
-        #     # Left arm landmarks
-        #     left_shoulder = pose_landmarks[11]
-        #     left_elbow = pose_landmarks[13]
-        #     left_wrist = pose_landmarks[15]
-        #
-        #     # Convert normalized coordinates to pixel coordinates
-        #     h, w, _ = annotated_image.shape
-        #     right_shoulder_coord = (int(right_shoulder.x * w), int(right_shoulder.y * h), right_shoulder.z)
-        #     right_elbow_coord = (int(right_elbow.x * w), int(right_elbow.y * h), right_elbow.z)
-        #     right_wrist_coord = (int(right_wrist.x * w), int(right_wrist.y * h), right_wrist.z)
-        #     left_shoulder_coord = (int(left_shoulder.x * w), int(left_shoulder.y * h), left_shoulder.z)
-        #     left_elbow_coord = (int(left_elbow.x * w), int(left_elbow.y * h), left_elbow.z)
-        #     left_wrist_coord = (int(left_wrist.x * w), int(left_wrist.y * h), left_wrist.z)
-        #
-        #     right_shoulder_cartesian_coord = pixel_to_cartesian(int(right_shoulder.x * w), int(right_shoulder.y * h), w, h)
-        #     right_elbow_cartesian_coord = pixel_to_cartesian(int(right_elbow.x * w), int(right_elbow.y * h), w, h)
-        #     right_wrist_cartesian_coord = pixel_to_cartesian(int(right_wrist.x * w), int(right_wrist.y * h), w, h)
-        #     left_shoulder_cartesian_coord = pixel_to_cartesian(int(left_shoulder.x * w), int(left_shoulder.y * h), w, h)
-        #     left_elbow_cartesian_coord = pixel_to_cartesian(int(left_elbow.x * w), int(left_elbow.y * h), w, h)
-        #     left_wrist_cartesian_coord = pixel_to_cartesian(int(left_wrist.x * w), int(left_wrist.y * h), w, h)
-        #
-        #     # Draw text (coordinates) on the image
-        #     cv2.putText(annotated_image, f"({right_shoulder_cartesian_coord[0]}, {right_shoulder_cartesian_coord[1]}, {right_shoulder_coord[2]})",
-        #                 (right_shoulder_coord[0], right_shoulder_coord[1] - 10),
-        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-        #     cv2.putText(annotated_image, f"({right_elbow_cartesian_coord[0]}, {right_elbow_cartesian_coord[1]}, {right_elbow_coord[2]})",
-        #                 (right_elbow_coord[0], right_elbow_coord[1] - 10),
-        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-        #     cv2.putText(annotated_image, f"({right_wrist_cartesian_coord[0]}, {right_wrist_cartesian_coord[1]}, {right_wrist_coord[2]})",
-        #                 (right_wrist_coord[0], right_wrist_coord[1] - 10),
-        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-        #
-        #     cv2.putText(annotated_image, f"({left_shoulder_cartesian_coord[0]}, {left_shoulder_cartesian_coord[1]}, {left_shoulder_coord[2]})",
-        #                 (left_shoulder_coord[0], left_shoulder_coord[1] - 10),
-        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-        #     cv2.putText(annotated_image, f"({left_elbow_cartesian_coord[0]}, {left_elbow_cartesian_coord[1]}, {left_elbow_coord[2]})",
-        #                 (left_elbow_coord[0], left_elbow_coord[1] - 10),
-        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-        #     cv2.putText(annotated_image, f"({left_wrist_cartesian_coord[0]}, {left_wrist_cartesian_coord[1]}, {left_wrist_coord[2]})",
-        #                 (left_wrist_coord[0], left_wrist_coord[1] - 10),
-        #                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
     return annotated_image
 
 # Callback for live stream results
@@ -187,3 +170,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+

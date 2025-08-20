@@ -19,20 +19,8 @@ class Leg:
 
 class Torso:
     def __init__(self, left_shoulder: Vec3, right_shoulder: Vec3, left_hip: Vec3, right_hip: Vec3):
-
-        # Center of torso
-        self.center = Vec3(
-            (left_shoulder.x + right_shoulder.x + left_hip.x + right_hip.x) / 4,
-            (left_shoulder.y + right_shoulder.y + left_hip.y + right_hip.y) / 4,
-            (left_shoulder.z + right_shoulder.z + left_hip.z + right_hip.z) / 4
-        )
-
-        # Two vectors along the torso plane
-        u = right_shoulder - left_shoulder
-        v = left_hip - left_shoulder
-
-        # Normal vector perpendicular to torso plane
-        self.vector = Vec3.cross(u, v).normalize()
+        self.right = BodyPart(right_shoulder, right_hip)
+        self.left = BodyPart(left_shoulder, left_hip)
 
 class Head:
     def __init__(self, nose: Vec3, left_eye: Vec3, right_eye: Vec3):
@@ -49,7 +37,7 @@ class Head:
         v = right_eye - nose
 
         # Normal vector perpendicular to head plane
-        self.vector = Vec3.cross(u, v).normalize()
+        # self.vector = Vec3.cross2(u, v).normalize()
 
 def build_body_parts(pose_landmarks, width, height):
     landmarks_dict = dict()
