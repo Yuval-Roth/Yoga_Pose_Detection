@@ -44,7 +44,9 @@ def is_warrior2(body_parts) -> bool:
 
     return right_straight and left_straight and left_arm_perpendicular and right_arm_perpendicular and one_bent and one_straight
 
-FPS = 30
+
+
+FPS = 60
 TIMESTAMP_STEP = int(1000 / FPS)
 timestamp = 0
 
@@ -113,10 +115,14 @@ def main():
     global annotated_frame
 
     # Open webcam
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(3)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
     cap.set(cv2.CAP_PROP_FPS, FPS)
+    cv2.namedWindow("Mediapipe Pose Live", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("Mediapipe Pose Live", 1920, 1080)
 
     if not cap.isOpened():
         print("Error: Could not open camera.")
@@ -159,6 +165,7 @@ def main():
         # Show annotated frame if available
         frame_to_draw = annotated_frame
         if frame_to_draw is not None:
+            frame_to_draw = cv2.resize(frame_to_draw, (2560, 1440))
             cv2.imshow("Mediapipe Pose Live", cv2.cvtColor(frame_to_draw, cv2.COLOR_RGB2BGR))
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
