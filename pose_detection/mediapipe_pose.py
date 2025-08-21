@@ -3,6 +3,7 @@ import cv2
 import mediapipe as mp
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
+from mediapipe.python.solutions.pose import PoseLandmark
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import numpy as np
@@ -39,7 +40,7 @@ def is_warrior2(body_parts) -> bool:
     # Check that one leg is bent and the other is straight
     right_leg_angle = Vec3.angle2(right_leg.first.vector, right_leg.second.vector)
     left_leg_angle = Vec3.angle2(left_leg.first.vector, left_leg.second.vector)
-    one_bent = exactly_one(abs(right_leg_angle - 90) < 10, abs(left_leg_angle - 90) < 10)
+    one_bent = exactly_one(abs(right_leg_angle - 65) < 10, abs(left_leg_angle - 65) < 10)
     one_straight = exactly_one(right_leg_angle < 10, left_leg_angle < 10)
 
     return right_straight and left_straight and left_arm_perpendicular and right_arm_perpendicular and one_bent and one_straight
@@ -77,30 +78,33 @@ def draw_landmarks_on_image(rgb_image, detection_result):
 
         h,w, _ = annotated_image.shape
         body_parts = build_body_parts(pose_landmarks, w, h)
-
-        # Draw body parts vectors in the center of the body part
-        cv2.putText(annotated_image,
-                f"{body_parts[BodyParts.RIGHT_ARM].first.vector}",
-                (body_parts[BodyParts.RIGHT_ARM].first.center.x, body_parts[BodyParts.RIGHT_ARM].first.center.y),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-        cv2.putText(annotated_image,
-                f"{body_parts[BodyParts.RIGHT_ARM].second.vector}",
-                (body_parts[BodyParts.RIGHT_ARM].second.center.x, body_parts[BodyParts.RIGHT_ARM].second.center.y),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-        cv2.putText(annotated_image,
-                f"{body_parts[BodyParts.LEFT_ARM].first.vector}",
-                (body_parts[BodyParts.LEFT_ARM].first.center.x, body_parts[BodyParts.LEFT_ARM].first.center.y),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-        cv2.putText(annotated_image,
-                f"{body_parts[BodyParts.LEFT_ARM].second.vector}",
-                (body_parts[BodyParts.LEFT_ARM].second.center.x, body_parts[BodyParts.LEFT_ARM].second.center.y),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+        left_arm_angle = Vec3.angle2(body_parts[BodyParts.LEFT_ARM].first.vector, body_parts[BodyParts.LEFT_ARM].second.vector)
+        right_arm_angle = Vec3.angle2(body_parts[BodyParts.RIGHT_ARM].first.vector, body_parts[BodyParts.RIGHT_ARM].second.vector)
+        left_leg_angle = Vec3.angle2(body_parts[BodyParts.LEFT_LEG].first.vector, body_parts[BodyParts.LEFT_LEG].second.vector)
+        # right leg angle
+        right_leg_angle = Vec3.angle2(body_parts[BodyParts.RIGHT_LEG].first.vector, body_parts[BodyParts.RIGHT_LEG].second.vector)
+        # left arm angle to torso
+        left_arm_torso_angle = Vec3.angle2(body_parts[BodyParts.TORSO].left.vector, body_parts[BodyParts.LEFT_ARM].first.vector)
+        # right arm angle to torso
+        right_arm_torso_angle = Vec3.angle2(body_parts[BodyParts.TORSO].right.vector, body_parts[BodyParts.RIGHT_ARM].first.vector)
+        # left leg angle to torso
+        left_leg_angle = Vec3.angle2(body_parts[BodyParts.TORSO].left.vector, body_parts[BodyParts.LEFT_LEG].first.vector)
+        # right leg angle to torso
+        right_leg_angle = Vec3.angle2(body_parts[BodyParts.TORSO].right.vector, body_parts[BodyParts.RIGHT_LEG].first.vector)
+git
+        # Draw angles on the image
+        cv2.putText(annotated_image, f"{int(left_arm_angle)}", (int(pose_landmarks[PoseLandmark.LEFT_ELBOW].x * w), int(pose_landmarks[PoseLandmark.LEFT_ELBOW].y * h)),cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(right_arm_angle)}", (int(pose_landmarks[PoseLandmark.RIGHT_ELBOW].x * w), int(pose_landmarks[PoseLandmark.RIGHT_ELBOW].y * h)),cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(left_leg_angle)}", (int(pose_landmarks[PoseLandmark.LEFT_KNEE].x * w), int(pose_landmarks[PoseLandmark.LEFT_KNEE].y * h)),cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(right_leg_angle)}", (int(pose_landmarks[PoseLandmark.RIGHT_KNEE].x * w), int(pose_landmarks[PoseLandmark.RIGHT_KNEE].y * h)),cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(left_arm_torso_angle)}", (int(pose_landmarks[PoseLandmark.LEFT_SHOULDER].x * w), int(pose_landmarks[PoseLandmark.LEFT_SHOULDER].y * h)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(right_arm_torso_angle)}", (int(pose_landmarks[PoseLandmark.RIGHT_SHOULDER].x * w), int(pose_landmarks[PoseLandmark.RIGHT_SHOULDER].y * h)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(left_leg_angle)}", (int(pose_landmarks[PoseLandmark.LEFT_HIP].x * w), int(pose_landmarks[PoseLandmark.LEFT_HIP].y * h)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(right_leg_angle)}", (int(pose_landmarks[PoseLandmark.RIGHT_HIP].x * w), int(pose_landmarks[PoseLandmark.RIGHT_HIP].y * h)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
         # check warrior2 pose
         if is_warrior2(body_parts):
             cv2.putText(annotated_image, "Warrior II Pose Detected", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        else:
-            cv2.putText(annotated_image, "Not Warrior II Pose", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
     return annotated_image
 
@@ -115,7 +119,7 @@ def main():
     global annotated_frame
 
     # Open webcam
-    cap = cv2.VideoCapture(3)
+    cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
     # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
