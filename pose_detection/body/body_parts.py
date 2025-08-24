@@ -2,34 +2,33 @@ from enum import Enum
 
 from mediapipe.python.solutions.pose import PoseLandmark
 
-from body.math_utils import Vec3
+from body.math_utils import Vec2
 
 
 class Arm:
-    def __init__(self, shoulder: Vec3, elbow: Vec3, wrist: Vec3):
+    def __init__(self, shoulder: Vec2, elbow: Vec2, wrist: Vec2):
         self.first = BodyPart(shoulder, elbow)
         self.second = BodyPart(elbow, wrist)
 
 
 class Leg:
-    def __init__(self, hip: Vec3, knee: Vec3, ankle: Vec3):
+    def __init__(self, hip: Vec2, knee: Vec2, ankle: Vec2):
         self.first = BodyPart(hip, knee)
         self.second = BodyPart(knee, ankle)
 
 
 class Torso:
-    def __init__(self, left_shoulder: Vec3, right_shoulder: Vec3, left_hip: Vec3, right_hip: Vec3):
+    def __init__(self, left_shoulder: Vec2, right_shoulder: Vec2, left_hip: Vec2, right_hip: Vec2):
         self.right = BodyPart(right_shoulder, right_hip)
         self.left = BodyPart(left_shoulder, left_hip)
 
 class Head:
-    def __init__(self, nose: Vec3, left_eye: Vec3, right_eye: Vec3):
+    def __init__(self, nose: Vec2, left_eye: Vec2, right_eye: Vec2):
 
         # Center of the head
-        self.center = Vec3(
+        self.center = Vec2(
             (nose.x + left_eye.x + right_eye.x) / 3,
-            (nose.y + left_eye.y + right_eye.y) / 3,
-            (nose.z + left_eye.z + right_eye.z) / 3
+            (nose.y + left_eye.y + right_eye.y) / 3
         )
 
         # Vectors along the head plane
@@ -42,7 +41,7 @@ class Head:
 def build_body_parts(pose_landmarks, width, height):
     landmarks_dict = dict()
     for idx, landmark in enumerate(pose_landmarks):
-        landmarks_dict[idx] = Vec3(int(landmark.x * width), int(landmark.y * height), round(landmark.z, 3))
+        landmarks_dict[idx] = Vec2(int(landmark.x * width), int(landmark.y * height))
 
     body_parts = {
         BodyParts.LEFT_ARM: Arm(landmarks_dict[PoseLandmark.LEFT_SHOULDER],
@@ -80,9 +79,8 @@ class BodyParts(Enum):
 
 class BodyPart:
     def __init__(self, start, end):
-        self.vector = (Vec3(end.x, start.y, end.z) - Vec3(start.x, end.y, start.z)).normalize()
-        self.center = Vec3(
+        self.vector = (Vec2(end.x, start.y) - Vec2(start.x, end.y)).normalize()
+        self.center = Vec2(
             int((start.x + end.x) / 2),
-            int((start.y + end.y) / 2),
-            (start.z + end.z) / 2
+            int((start.y + end.y) / 2)
         )

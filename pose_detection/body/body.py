@@ -6,7 +6,7 @@ class Body:
     def __init__(self, pose_landmarks, width, height):
         self.landmarks = dict()
         for idx, landmark in enumerate(pose_landmarks):
-            self.landmarks[idx] = Vec3(int(landmark.x * width), int(landmark.y * height), round(landmark.z, 3))
+            self.landmarks[idx] = Vec2(int(landmark.x * width), int(landmark.y * height))
 
         self.body_parts = {
             BodyParts.LEFT_ARM: Arm(self.landmarks[PoseLandmark.LEFT_SHOULDER],
@@ -30,29 +30,44 @@ class Body:
                                  self.landmarks[PoseLandmark.RIGHT_EYE])
         }
 
+    def hips_center(self) -> Vec2:
+        x = int((self.landmarks[PoseLandmark.LEFT_HIP].x + self.landmarks[PoseLandmark.RIGHT_HIP].x) / 2)
+        y = int((self.landmarks[PoseLandmark.LEFT_HIP].y + self.landmarks[PoseLandmark.RIGHT_HIP].y) / 2)
+        return Vec2(x,y)
+
+    def shoulders_center(self):
+        x = int((self.landmarks[PoseLandmark.LEFT_SHOULDER].x + self.landmarks[PoseLandmark.RIGHT_SHOULDER].x) / 2)
+        y = int((self.landmarks[PoseLandmark.LEFT_SHOULDER].y + self.landmarks[PoseLandmark.RIGHT_SHOULDER].y) / 2)
+        return Vec2(x,y)
+
+    def face_center(self):
+        x = self.landmarks[PoseLandmark.NOSE].x
+        y = self.landmarks[PoseLandmark.NOSE].y
+        return Vec2(x,y)
+
     def left_shoulder_angle(self):
-        return 180 + Vec3.angle2(self.body_parts[BodyParts.LEFT_ARM].first.vector, self.body_parts[BodyParts.TORSO].left.vector)
+        return 180 + Vec2.angle(self.body_parts[BodyParts.LEFT_ARM].first.vector, self.body_parts[BodyParts.TORSO].left.vector)
 
     def right_shoulder_angle(self):
-        return 180 + Vec3.angle2(self.body_parts[BodyParts.TORSO].right.vector, self.body_parts[BodyParts.RIGHT_ARM].first.vector)
+        return 180 + Vec2.angle(self.body_parts[BodyParts.TORSO].right.vector, self.body_parts[BodyParts.RIGHT_ARM].first.vector)
 
     def left_elbow_angle(self):
-        return 180 - Vec3.angle2(self.body_parts[BodyParts.LEFT_ARM].first.vector, self.body_parts[BodyParts.LEFT_ARM].second.vector)
+        return 180 - Vec2.angle(self.body_parts[BodyParts.LEFT_ARM].first.vector, self.body_parts[BodyParts.LEFT_ARM].second.vector)
 
     def right_elbow_angle(self):
-        return 180 - Vec3.angle2(self.body_parts[BodyParts.RIGHT_ARM].second.vector, self.body_parts[BodyParts.RIGHT_ARM].first.vector)
+        return 180 - Vec2.angle(self.body_parts[BodyParts.RIGHT_ARM].second.vector, self.body_parts[BodyParts.RIGHT_ARM].first.vector)
 
     def left_hip_angle(self):
-        return 180 - Vec3.angle2(self.body_parts[BodyParts.TORSO].left.vector, self.body_parts[BodyParts.LEFT_LEG].first.vector)
+        return 180 - Vec2.angle(self.body_parts[BodyParts.TORSO].left.vector, self.body_parts[BodyParts.LEFT_LEG].first.vector)
 
     def right_hip_angle(self):
-        return 180 - Vec3.angle2(self.body_parts[BodyParts.RIGHT_LEG].first.vector, self.body_parts[BodyParts.TORSO].right.vector)
+        return 180 - Vec2.angle(self.body_parts[BodyParts.RIGHT_LEG].first.vector, self.body_parts[BodyParts.TORSO].right.vector)
 
     def left_knee_angle(self):
-        return 180 - Vec3.angle2(self.body_parts[BodyParts.LEFT_LEG].second.vector, self.body_parts[BodyParts.LEFT_LEG].first.vector)
+        return 180 - Vec2.angle(self.body_parts[BodyParts.LEFT_LEG].second.vector, self.body_parts[BodyParts.LEFT_LEG].first.vector)
 
     def right_knee_angle(self):
-        return 180 - Vec3.angle2(self.body_parts[BodyParts.RIGHT_LEG].first.vector, self.body_parts[BodyParts.RIGHT_LEG].second.vector)
+        return 180 - Vec2.angle(self.body_parts[BodyParts.RIGHT_LEG].first.vector, self.body_parts[BodyParts.RIGHT_LEG].second.vector)
 
     def is_left_hand_straight(self):
         return abs(180 - self.left_elbow_angle()) < 40
