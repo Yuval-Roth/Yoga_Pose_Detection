@@ -2,7 +2,7 @@ from enum import Enum
 
 from mediapipe.python.solutions.pose import PoseLandmark
 
-from body_parts.math_utils import Vec3
+from body.math_utils import Vec3
 
 
 class Arm:
