@@ -29,7 +29,7 @@ def is_warrior2(body: Body) -> bool:
     # Check that one leg is bent and the other is straight
     right_leg_angle = body.right_knee_angle()
     left_leg_angle = body.left_knee_angle()
-    one_bent = exactly_one(is_angle(right_leg_angle, 65, 15), is_angle(left_leg_angle, 65, 15))
+    one_bent = exactly_one(is_angle(right_leg_angle, 105, 15), is_angle(left_leg_angle, 105, 15))
     one_straight = exactly_one(body.is_left_leg_straight(), body.is_right_leg_straight())
 
     return (

@@ -71,7 +71,13 @@ def main():
     global annotated_frame
 
     # Open webcam
-    cap = cv2.VideoCapture(0)
+    camera_index = 1
+    cap = cv2.VideoCapture(camera_index)
+    while not cap.isOpened():
+        camera_index += 1
+        cap = cv2.VideoCapture(camera_index)
+        print(f"Camera not found in index {camera_index}, retrying...")
+
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
     # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
