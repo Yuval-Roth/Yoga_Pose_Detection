@@ -15,7 +15,7 @@ def is_angle(angle: float, target: float, tolerance: float, _range: Tuple[int] =
     """
     Check if the angle is within the target ± tolerance.
     """
-    if range:
+    if _range:
         if angle < _range[0] or angle > _range[1]:
             return False
     return angle_diff(angle,target) <= tolerance
@@ -83,10 +83,10 @@ def is_downward_dog(body: Body) -> bool:
     """
 
     # Facing left:
-    left_arm_straight = is_angle(body.left_elbow_angle(),200,50)
-    right_arm_straight = is_angle(body.right_elbow_angle(),160,50)
-    left_leg_straight = is_angle(body.left_knee_angle(),200,50)
-    right_leg_straight = is_angle(body.right_knee_angle(),160,50)
+    left_arm_straight = is_angle(body.left_elbow_angle(),200,40)
+    right_arm_straight = is_angle(body.right_elbow_angle(),160,40)
+    left_leg_straight = is_angle(body.left_knee_angle(),200,30)
+    right_leg_straight = is_angle(body.right_knee_angle(),160,30)
     left_hip_angle_ok = is_angle(body.left_hip_angle(),90,50)
     right_hip_angle_ok = is_angle(body.right_hip_angle(),270,50)
     left_shoulder_angle_ok = is_angle(body.left_shoulder_angle(),10,50)
@@ -98,10 +98,10 @@ def is_downward_dog(body: Body) -> bool:
         return True
 
     # Facing right:
-    left_arm_straight = is_angle(body.left_elbow_angle(),160,50)
-    right_arm_straight = is_angle(body.right_elbow_angle(),200,50)
-    left_leg_straight = is_angle(body.left_knee_angle(),160,50)
-    right_leg_straight = is_angle(body.right_knee_angle(),200,50)
+    left_arm_straight = is_angle(body.left_elbow_angle(),160,40)
+    right_arm_straight = is_angle(body.right_elbow_angle(),200,40)
+    left_leg_straight = is_angle(body.left_knee_angle(),160,30)
+    right_leg_straight = is_angle(body.right_knee_angle(),200,30)
     left_hip_angle_ok = is_angle(body.left_hip_angle(),270,50)
     right_hip_angle_ok = is_angle(body.right_hip_angle(),90,50)
     left_shoulder_angle_ok = is_angle(body.left_shoulder_angle(),340,50)
@@ -110,6 +110,39 @@ def is_downward_dog(body: Body) -> bool:
     shoulders_above_face = body.shoulders_center().y < body.face_center().y
 
     return left_arm_straight and right_arm_straight and left_leg_straight and right_leg_straight and left_hip_angle_ok and right_hip_angle_ok and left_shoulder_angle_ok and right_shoulder_angle_ok and hips_above_shoulders and shoulders_above_face
+
+def is_snake(body: Body) -> bool:
+    """
+    Check if the body parts correspond to Cobra pose.
+    """
+    # Facing left:
+    left_arm_straight = is_angle(body.left_elbow_angle(),170,40)
+    right_arm_straight = is_angle(body.right_elbow_angle(),170,40)
+    left_leg_straight = is_angle(body.left_knee_angle(),160,30)
+    right_leg_straight = is_angle(body.right_knee_angle(),200,30)
+    left_hip_angle_ok = is_angle(body.left_hip_angle(),200,50)
+    right_hip_angle_ok = is_angle(body.right_hip_angle(),140,50)
+    left_shoulder_angle_ok = is_angle(body.left_shoulder_angle(),150,30)
+    right_shoulder_angle_ok = is_angle(body.right_shoulder_angle(),210,30)
+    hips_below_shoulders = body.hips_center().y > body.shoulders_center().y
+    palms_below_hips = body.left_palm().y > body.hips_center().y and body.right_palm().y > body.hips_center().y
+
+    if left_arm_straight and right_arm_straight and left_leg_straight and right_leg_straight and left_hip_angle_ok and right_hip_angle_ok and left_shoulder_angle_ok and right_shoulder_angle_ok and hips_below_shoulders and palms_below_hips:
+        return True
+
+
+    # Facing right:
+    left_arm_straight2 = is_angle(body.left_elbow_angle(),170,40)
+    right_arm_straight2 = is_angle(body.right_elbow_angle(),170,40)
+    left_leg_straight2 = is_angle(body.left_knee_angle(),200,30)
+    right_leg_straight2 = is_angle(body.right_knee_angle(),160,30)
+    left_hip_angle_ok2 = is_angle(body.left_hip_angle(),140,50)
+    right_hip_angle_ok2 = is_angle(body.right_hip_angle(),200,50)
+    left_shoulder_angle_ok2 = is_angle(body.left_shoulder_angle(),210,30)
+    right_shoulder_angle_ok2 = is_angle(body.right_shoulder_angle(),150,30)
+    hips_below_shoulders2 = body.hips_center().y > body.shoulders_center().y
+    palms_below_hips2 = body.left_palm().y > body.hips_center().y and body.right_palm().y > body.hips_center().y
+    return left_arm_straight2 and right_arm_straight2 and left_leg_straight2 and right_leg_straight2 and left_hip_angle_ok2 and right_hip_angle_ok2 and left_shoulder_angle_ok2 and right_shoulder_angle_ok2 and hips_below_shoulders2 and palms_below_hips2
 
 
 def detect_pose(body: Body) -> Tuple[bool, str]:
@@ -126,6 +159,8 @@ def detect_pose(body: Body) -> Tuple[bool, str]:
         return True, "Tree Pose"
     if is_downward_dog(body):
         return True, "Downward Dog Pose"
+    if is_snake(body):
+        return True, "Snake Pose"
 
 
 

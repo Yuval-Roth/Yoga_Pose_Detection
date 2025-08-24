@@ -45,6 +45,12 @@ class Body:
         y = self.landmarks[PoseLandmark.NOSE].y
         return Vec2(x,y)
 
+    def left_palm(self):
+        return self.landmarks[PoseLandmark.LEFT_WRIST]
+
+    def right_palm(self):
+        return self.landmarks[PoseLandmark.RIGHT_WRIST]
+
     def left_shoulder_angle(self):
         return 180 + Vec2.angle(self.body_parts[BodyParts.LEFT_ARM].first.vector, self.body_parts[BodyParts.TORSO].left.vector)
 

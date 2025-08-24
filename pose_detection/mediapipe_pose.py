@@ -143,9 +143,9 @@ def run_image(image_path: str):
         base_options=base_options,
         running_mode=vision.RunningMode.IMAGE,
         output_segmentation_masks=False,
-        min_pose_presence_confidence=0.1,
-        min_pose_detection_confidence=0.1,
-        min_tracking_confidence=0.1,
+        # min_pose_presence_confidence=0.1,
+        # min_pose_detection_confidence=0.1,
+        # min_tracking_confidence=0.1,
         num_poses=5
     )
     detector = vision.PoseLandmarker.create_from_options(options)
@@ -203,7 +203,7 @@ def run_on_video(video_path: str):
 
 if __name__ == "__main__":
     run_live_stream()
-    # run_image("poses/02_downward_facing_dog2.png")
+    # run_image("poses/03_snake2.png")
 
 
 
