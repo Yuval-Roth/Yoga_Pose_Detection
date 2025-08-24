@@ -198,7 +198,8 @@ def run_on_video(video_path: str):
 
 
 if __name__ == "__main__":
-    run_image()
+    run_live_stream()
+    # run_image("poses/01_tree.png")
 
 
 
