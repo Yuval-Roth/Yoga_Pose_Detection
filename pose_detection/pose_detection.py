@@ -144,6 +144,36 @@ def is_snake(body: Body) -> bool:
     palms_below_hips2 = body.left_palm().y > body.hips_center().y and body.right_palm().y > body.hips_center().y
     return left_arm_straight2 and right_arm_straight2 and left_leg_straight2 and right_leg_straight2 and left_hip_angle_ok2 and right_hip_angle_ok2 and left_shoulder_angle_ok2 and right_shoulder_angle_ok2 and hips_below_shoulders2 and palms_below_hips2
 
+def is_cat(body: Body) -> bool:
+    """
+    Check if the body parts correspond to Cat pose.
+    """
+    # Facing left:
+    left_arm_straight = is_angle(body.left_elbow_angle(),180,40)
+    right_arm_straight = is_angle(body.right_elbow_angle(),180,40)
+    left_shoulder_angle_ok = is_angle(body.left_shoulder_angle(),270,30)
+    right_shoulder_angle_ok = is_angle(body.right_shoulder_angle(),90,30)
+    left_hip_angle_ok = is_angle(body.left_hip_angle(),260,50)
+    right_hip_angle_ok = is_angle(body.right_hip_angle(),100,50)
+    left_leg_angle_ok = is_angle(body.left_knee_angle(),260,30)
+    right_leg_angle_ok = is_angle(body.right_knee_angle(),90,30)
+    head_below_shoulders = body.face_center().y > body.shoulders_center().y
+
+    if left_arm_straight and right_arm_straight and left_shoulder_angle_ok and right_shoulder_angle_ok and left_hip_angle_ok and right_hip_angle_ok and left_leg_angle_ok and right_leg_angle_ok and head_below_shoulders:
+        return True
+
+    # Facing right:
+    left_arm_straight2 = is_angle(body.left_elbow_angle(),180,40)
+    right_arm_straight2 = is_angle(body.right_elbow_angle(),180,40)
+    left_shoulder_angle_ok2 = is_angle(body.left_shoulder_angle(),90,30)
+    right_shoulder_angle_ok2 = is_angle(body.right_shoulder_angle(),270,30)
+    left_hip_angle_ok2 = is_angle(body.left_hip_angle(),100,50)
+    right_hip_angle_ok2 = is_angle(body.right_hip_angle(),260,50)
+    left_leg_angle_ok2 = is_angle(body.left_knee_angle(),90,30)
+    right_leg_angle_ok2 = is_angle(body.right_knee_angle(),260,30)
+    head_below_shoulders2 = body.face_center().y > body.shoulders_center().y
+    return left_arm_straight2 and right_arm_straight2 and left_shoulder_angle_ok2 and right_shoulder_angle_ok2 and left_hip_angle_ok2 and right_hip_angle_ok2 and left_leg_angle_ok2 and right_leg_angle_ok2 and head_below_shoulders2
+
 
 def detect_pose(body: Body) -> Tuple[bool, str]:
     """
@@ -161,6 +191,8 @@ def detect_pose(body: Body) -> Tuple[bool, str]:
         return True, "Downward Dog Pose"
     if is_snake(body):
         return True, "Snake Pose"
+    if is_cat(body):
+        return True, "Cat Pose"
 
 
 
