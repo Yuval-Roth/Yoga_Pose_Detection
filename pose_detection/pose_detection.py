@@ -189,6 +189,38 @@ def is_frog(body: Body) -> bool:
 
     return left_hand_straight and right_hand_straight and left_leg_angle_ok and right_leg_angle_ok and left_hip_angle_ok and right_hip_angle_ok and hips_below_shoulders and palms_below_hips
 
+def is_shark(body: Body) -> bool:
+    """
+    Check if the body parts correspond to Shark pose.
+    """
+    # Facing left:
+    left_arm_straight = is_angle(body.left_elbow_angle(),180,40)
+    right_arm_straight = is_angle(body.right_elbow_angle(),180,40)
+    left_knee_angle_ok = is_angle(body.left_knee_angle(),210,30)
+    right_knee_angle_ok = is_angle(body.right_knee_angle(),145,30)
+    left_shoulder_angle_ok = is_angle(body.left_shoulder_angle(),190,30)
+    right_shoulder_angle_ok = is_angle(body.right_shoulder_angle(),170,30)
+    left_hip_angle_ok = is_angle(body.left_hip_angle(),190,30)
+    right_hip_angle_ok = is_angle(body.right_hip_angle(),170,30)
+    shoulders_height_close_to_knees = abs(body.shoulders_center().y / body.knees_center().y) < 1.2
+
+    if left_arm_straight and right_arm_straight and left_knee_angle_ok and right_knee_angle_ok and left_shoulder_angle_ok and right_shoulder_angle_ok and left_hip_angle_ok and right_hip_angle_ok and shoulders_height_close_to_knees:
+        return True
+
+    # Facing right:
+    left_arm_straight2 = is_angle(body.left_elbow_angle(),180,40)
+    right_arm_straight2 = is_angle(body.right_elbow_angle(),180,40)
+    left_knee_angle_ok2 = is_angle(body.left_knee_angle(),145,60)
+    right_knee_angle_ok2 = is_angle(body.right_knee_angle(),210,60)
+    left_shoulder_angle_ok2 = is_angle(body.left_shoulder_angle(),190,50)
+    right_shoulder_angle_ok2 = is_angle(body.right_shoulder_angle(),200,50)
+    left_hip_angle_ok2 = is_angle(body.left_hip_angle(),170,30)
+    right_hip_angle_ok2 = is_angle(body.right_hip_angle(),190,30)
+    shoulders_height_close_to_knees2 = abs(body.shoulders_center().y / body.knees_center().y) < 1.2
+
+    return left_arm_straight2 and right_arm_straight2 and left_knee_angle_ok2 and right_knee_angle_ok2 and left_shoulder_angle_ok2 and right_shoulder_angle_ok2 and left_hip_angle_ok2 and right_hip_angle_ok2 and shoulders_height_close_to_knees2
+
+
 def detect_pose(body: Body) -> Tuple[bool, str]:
     """
     Detect the pose of the body and return a tuple indicating if a pose is detected and its name.
@@ -209,6 +241,8 @@ def detect_pose(body: Body) -> Tuple[bool, str]:
         return True, "Cat Pose"
     if is_frog(body):
         return True, "Frog Pose"
+    if is_shark(body):
+        return True, "Shark Pose"
 
 
 

@@ -51,6 +51,11 @@ class Body:
     def right_palm(self):
         return self.landmarks[PoseLandmark.RIGHT_WRIST]
 
+    def knees_center(self):
+        x = int((self.landmarks[PoseLandmark.LEFT_KNEE].x + self.landmarks[PoseLandmark.RIGHT_KNEE].x) / 2)
+        y = int((self.landmarks[PoseLandmark.LEFT_KNEE].y + self.landmarks[PoseLandmark.RIGHT_KNEE].y) / 2)
+        return Vec2(x,y)
+
     def left_shoulder_angle(self):
         return 180 + Vec2.angle(self.body_parts[BodyParts.LEFT_ARM].first.vector, self.body_parts[BodyParts.TORSO].left.vector)
 
