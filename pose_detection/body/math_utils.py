@@ -35,15 +35,26 @@ class Vec3:
     @staticmethod
     def angle2(v1, v2):
         """
-        Calculate the angle in degrees between two vectors v1 and v2.
+        Calculate the signed angle in degrees between two vectors v1 and v2.
         Based on x and y components only, ignoring z.
+        Positive = counter-clockwise, Negative = clockwise.
         """
         dot_product = v1.x * v2.x + v1.y * v2.y
+        cross_product = v1.x * v2.y - v1.y * v2.x  # 2D equivalent of z-component of cross
+
         magnitude_v1 = v1.magnitude()
         magnitude_v2 = v2.magnitude()
         if magnitude_v1 == 0 or magnitude_v2 == 0:
             return 0.0
+
         cos_angle = dot_product / (magnitude_v1 * magnitude_v2)
-        cos_angle = max(-1.0, min(1.0, cos_angle))
+        cos_angle = max(-1.0, min(1.0, cos_angle))  # clamp to avoid NaNs
+
         angle_rad = math.acos(cos_angle)
+
+        # Use cross product to determine sign
+        if cross_product < 0:
+            angle_rad = -angle_rad
+
         return math.degrees(angle_rad)
+
