@@ -9,7 +9,7 @@ from mediapipe.tasks.python import vision
 import numpy as np
 
 from body.body import Body
-from pose_detection import is_warrior2
+from pose_detection import detect_pose
 
 FPS = 60
 TIMESTAMP_STEP = int(1000 / FPS)
@@ -54,9 +54,9 @@ def draw_landmarks_on_image(rgb_image, detection_result):
         cv2.putText(annotated_image, f"{int(body.left_hip_angle())}", (int(pose_landmarks[PoseLandmark.LEFT_HIP].x * w), int(pose_landmarks[PoseLandmark.LEFT_HIP].y * h)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
         cv2.putText(annotated_image, f"{int(body.right_hip_angle())}", (int(pose_landmarks[PoseLandmark.RIGHT_HIP].x * w), int(pose_landmarks[PoseLandmark.RIGHT_HIP].y * h)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
-        # check warrior2 pose
-        if is_warrior2(body):
-            cv2.putText(annotated_image, "Warrior II Pose Detected", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        detected,pose = detect_pose(body)
+        if detected:
+            cv2.putText(annotated_image, f"{pose}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
     return annotated_image
 
@@ -199,7 +199,7 @@ def run_on_video(video_path: str):
 
 if __name__ == "__main__":
     run_live_stream()
-    # run_image("poses/01_tree.png")
+    # run_image("poses/02_downward_facing_dog.png")
 
 
 
