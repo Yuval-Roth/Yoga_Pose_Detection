@@ -174,6 +174,20 @@ def is_cat(body: Body) -> bool:
     head_below_shoulders2 = body.face_center().y > body.shoulders_center().y
     return left_arm_straight2 and right_arm_straight2 and left_shoulder_angle_ok2 and right_shoulder_angle_ok2 and left_hip_angle_ok2 and right_hip_angle_ok2 and left_leg_angle_ok2 and right_leg_angle_ok2 and head_below_shoulders2
 
+def is_frog(body: Body) -> bool:
+    """
+    Check if the body parts correspond to Frog pose.
+    """
+    left_hand_straight = is_angle(body.left_elbow_angle(),180,40)
+    right_hand_straight = is_angle(body.right_elbow_angle(),180,40)
+    left_leg_angle_ok = is_angle(body.left_knee_angle(),70,30)
+    right_leg_angle_ok = is_angle(body.right_knee_angle(),70,30)
+    left_hip_angle_ok = is_angle(body.left_hip_angle(),70,30)
+    right_hip_angle_ok = is_angle(body.right_hip_angle(),70,30)
+    hips_below_shoulders = body.hips_center().y > body.shoulders_center().y
+    palms_below_hips = body.left_palm().y > body.hips_center().y and body.right_palm().y > body.hips_center().y
+
+    return left_hand_straight and right_hand_straight and left_leg_angle_ok and right_leg_angle_ok and left_hip_angle_ok and right_hip_angle_ok and hips_below_shoulders and palms_below_hips
 
 def detect_pose(body: Body) -> Tuple[bool, str]:
     """
@@ -193,6 +207,8 @@ def detect_pose(body: Body) -> Tuple[bool, str]:
         return True, "Snake Pose"
     if is_cat(body):
         return True, "Cat Pose"
+    if is_frog(body):
+        return True, "Frog Pose"
 
 
 
