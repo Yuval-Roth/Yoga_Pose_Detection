@@ -67,7 +67,7 @@ def result_callback(result: vision.PoseLandmarkerResult, output_image: mp.Image,
     annotated_frame = draw_landmarks_on_image(rgb_view, result)
 
 
-def main():
+def run_live_stream():
     global annotated_frame
 
     # Open webcam
@@ -136,9 +136,69 @@ def main():
     cap.release()
     cv2.destroyAllWindows()
 
+def run_image(image_path: str):
+    base_options = python.BaseOptions(model_asset_path="model/pose_landmarker_heavy.task")
+    options = vision.PoseLandmarkerOptions(
+        base_options=base_options,
+        running_mode=vision.RunningMode.IMAGE,
+        output_segmentation_masks=False,
+        num_poses=5
+    )
+    detector = vision.PoseLandmarker.create_from_options(options)
+
+    # Load image
+    bgr_image = cv2.imread(image_path)
+    rgb_image = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB)
+    mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
+
+    # Detect poses
+    result = detector.detect(mp_image)
+
+    # Annotate
+    annotated = draw_landmarks_on_image(rgb_image, result)
+    cv2.imshow("Pose on Image", cv2.cvtColor(annotated, cv2.COLOR_RGB2BGR))
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+def run_on_video(video_path: str):
+    base_options = python.BaseOptions(model_asset_path="model/pose_landmarker_heavy.task")
+    options = vision.PoseLandmarkerOptions(
+        base_options=base_options,
+        running_mode=vision.RunningMode.VIDEO,
+        output_segmentation_masks=False,
+        num_poses=5
+    )
+    detector = vision.PoseLandmarker.create_from_options(options)
+
+    cap = cv2.VideoCapture(video_path)
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    timestamp_step = int(1000 / fps)
+    timestamp = 0
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        frame = cv2.flip(frame, 1)
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
+
+        result = detector.detect_for_video(mp_image, timestamp)
+        timestamp += timestamp_step
+
+        annotated = draw_landmarks_on_image(rgb_frame, result)
+        cv2.imshow("Pose on Video", cv2.cvtColor(annotated, cv2.COLOR_RGB2BGR))
+
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
-    main()
+    run_image()
 
 
 
