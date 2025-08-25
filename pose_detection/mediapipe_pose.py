@@ -12,7 +12,7 @@ from body.body import Body
 from body.body_parts import *
 from pose_detection import detect_pose
 
-LAPTOP = True
+LAPTOP = False
 FPS = 60
 TIMESTAMP_STEP = int(1000 / FPS)
 timestamp = 0
@@ -71,30 +71,21 @@ def annotate_body(annotated_image):
     cv2.line(annotated_image, (right_knee.x, right_knee.y), (right_ankle.x, right_ankle.y), (255, 255, 0), 2)
     cv2.line(annotated_image, (left_shoulder.x, left_shoulder.y), (left_hip.x, left_hip.y), (0, 255, 255), 2)
     cv2.line(annotated_image, (right_shoulder.x, right_shoulder.y), (right_hip.x, right_hip.y), (0, 255, 255), 2)
-    cv2.line(annotated_image, (left_shoulder.x, left_shoulder.y), (right_shoulder.x, right_shoulder.y), (255, 0, 255),
-             2)
+    cv2.line(annotated_image, (left_shoulder.x, left_shoulder.y), (right_shoulder.x, right_shoulder.y), (255, 0, 255), 2)
     cv2.line(annotated_image, (left_hip.x, left_hip.y), (right_hip.x, right_hip.y), (255, 0, 255), 2)
     cv2.circle(annotated_image, (nose.x, nose.y), 5, (0, 255, 255), -1)
     cv2.circle(annotated_image, (left_eye.x, left_eye.y), 5, (255, 0, 255), -1)
     cv2.circle(annotated_image, (right_eye.x, right_eye.y), 5, (255, 0, 255), -1)
 
     # Draw angles on the image
-    cv2.putText(annotated_image, f"{int(body.left_elbow_angle())}", (left_elbow.x, left_elbow.y),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-    cv2.putText(annotated_image, f"{int(body.right_elbow_angle())}", (right_elbow.x, right_elbow.y),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-    cv2.putText(annotated_image, f"{int(body.left_knee_angle())}", (left_knee.x, left_knee.y), cv2.FONT_HERSHEY_SIMPLEX,
-                0.6, (0, 255, 0), 2),
-    cv2.putText(annotated_image, f"{int(body.right_knee_angle())}", (right_knee.x, right_knee.y),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-    cv2.putText(annotated_image, f"{int(body.left_shoulder_angle())}", (left_shoulder.x, left_shoulder.y),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-    cv2.putText(annotated_image, f"{int(body.right_shoulder_angle())}", (right_shoulder.x, right_shoulder.y),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-    cv2.putText(annotated_image, f"{int(body.left_hip_angle())}", (left_hip.x, left_hip.y), cv2.FONT_HERSHEY_SIMPLEX,
-                0.6, (0, 255, 0), 2),
-    cv2.putText(annotated_image, f"{int(body.right_hip_angle())}", (right_hip.x, right_hip.y), cv2.FONT_HERSHEY_SIMPLEX,
-                0.6, (0, 255, 0), 2)
+    cv2.putText(annotated_image, f"{int(body.left_elbow_angle())}", (left_elbow.x + 10, left_elbow.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.right_elbow_angle())}", (right_elbow.x - 45, right_elbow.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.left_knee_angle())}", (left_knee.x + 10, left_knee.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.right_knee_angle())}", (right_knee.x - 45, right_knee.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.left_shoulder_angle())}", (left_shoulder.x + 10, left_shoulder.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.right_shoulder_angle())}", (right_shoulder.x - 45, right_shoulder.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.left_hip_angle())}", (left_hip.x + 10, left_hip.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.right_hip_angle())}", (right_hip.x - 45, right_hip.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
 def annotate_body_old(annotated_image, pose_landmarks):
     # ================================ #
