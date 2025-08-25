@@ -12,6 +12,7 @@ from body.body import Body
 from body.body_parts import *
 from pose_detection import detect_pose
 
+LAPTOP = False
 FPS = 60
 TIMESTAMP_STEP = int(1000 / FPS)
 timestamp = 0
@@ -29,83 +30,8 @@ def draw_landmarks_on_image(rgb_image, detection_result):
     for idx in range(len(pose_landmarks_list)):
         pose_landmarks = pose_landmarks_list[idx]
 
-        # Convert to protobuf
-        pose_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
-        pose_landmarks_proto.landmark.extend([
-            landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z)
-            for landmark in pose_landmarks
-        ])
-
         body.update(pose_landmarks)
-
-        # =============================== #
-        # new version with body smoothing #
-        # ================================#
-
-        nose = body.parts[BodyParts.HEAD].nose
-        left_eye = body.parts[BodyParts.HEAD].left_eye
-        right_eye = body.parts[BodyParts.HEAD].right_eye
-        left_shoulder = body.parts[BodyParts.LEFT_ARM].shoulder
-        left_elbow = body.parts[BodyParts.LEFT_ARM].elbow
-        left_wrist = body.parts[BodyParts.LEFT_ARM].wrist
-        right_shoulder = body.parts[BodyParts.RIGHT_ARM].shoulder
-        right_elbow = body.parts[BodyParts.RIGHT_ARM].elbow
-        right_wrist = body.parts[BodyParts.RIGHT_ARM].wrist
-        left_hip = body.parts[BodyParts.LEFT_LEG].hip
-        left_knee = body.parts[BodyParts.LEFT_LEG].knee
-        left_ankle = body.parts[BodyParts.LEFT_LEG].ankle
-        right_hip = body.parts[BodyParts.RIGHT_LEG].hip
-        right_knee = body.parts[BodyParts.RIGHT_LEG].knee
-        right_ankle = body.parts[BodyParts.RIGHT_LEG].ankle
-
-        # Draw the smoothed landmarks
-        cv2.line(annotated_image, (left_shoulder.x, left_shoulder.y), (left_elbow.x, left_elbow.y), (255, 0, 0), 2)
-        cv2.line(annotated_image, (left_elbow.x, left_elbow.y), (left_wrist.x, left_wrist.y), (255, 0, 0), 2)
-        cv2.line(annotated_image, (right_shoulder.x, right_shoulder.y), (right_elbow.x, right_elbow.y), (0, 255, 0), 2)
-        cv2.line(annotated_image, (right_elbow.x, right_elbow.y), (right_wrist.x, right_wrist.y), (0, 255, 0), 2)
-        cv2.line(annotated_image, (left_hip.x, left_hip.y), (left_knee.x, left_knee.y), (0, 0, 255), 2)
-        cv2.line(annotated_image, (left_knee.x, left_knee.y), (left_ankle.x, left_ankle.y), (0, 0, 255), 2)
-        cv2.line(annotated_image, (right_hip.x, right_hip.y), (right_knee.x, right_knee.y), (255, 255, 0), 2)
-        cv2.line(annotated_image, (right_knee.x, right_knee.y), (right_ankle.x, right_ankle.y), (255, 255, 0), 2)
-        cv2.line(annotated_image, (left_shoulder.x, left_shoulder.y), (left_hip.x, left_hip.y), (0, 255, 255), 2)
-        cv2.line(annotated_image, (right_shoulder.x, right_shoulder.y), (right_hip.x, right_hip.y), (0, 255, 255), 2)
-        cv2.line(annotated_image, (left_shoulder.x, left_shoulder.y), (right_shoulder.x, right_shoulder.y), (255, 0, 255), 2)
-        cv2.line(annotated_image, (left_hip.x, left_hip.y), (right_hip.x, right_hip.y), (255, 0, 255), 2)
-        cv2.circle(annotated_image, (nose.x, nose.y), 5, (0, 255, 255), -1)
-        cv2.circle(annotated_image, (left_eye.x, left_eye.y), 5, (255, 0, 255), -1)
-        cv2.circle(annotated_image, (right_eye.x, right_eye.y), 5, (255, 0, 255), -1)
-
-        # Draw angles on the image
-        cv2.putText(annotated_image, f"{int(body.left_elbow_angle())}",(left_elbow.x,left_elbow.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6,(0, 255, 0), 2),
-        cv2.putText(annotated_image, f"{int(body.right_elbow_angle())}",(right_elbow.x,right_elbow.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6,(0, 255, 0), 2),
-        cv2.putText(annotated_image, f"{int(body.left_knee_angle())}",(left_knee.x,left_knee.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6,(0, 255, 0), 2),
-        cv2.putText(annotated_image, f"{int(body.right_knee_angle())}",(right_knee.x,right_knee.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6,(0, 255, 0), 2),
-        cv2.putText(annotated_image, f"{int(body.left_shoulder_angle())}",(left_shoulder.x,left_shoulder.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6,(0, 255, 0), 2),
-        cv2.putText(annotated_image, f"{int(body.right_shoulder_angle())}",(right_shoulder.x,right_shoulder.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6,(0, 255, 0), 2),
-        cv2.putText(annotated_image, f"{int(body.left_hip_angle())}",(left_hip.x,left_hip.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6,(0, 255, 0), 2),
-        cv2.putText(annotated_image, f"{int(body.right_hip_angle())}",(right_hip.x,right_hip.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6,(0, 255, 0), 2)
-
-        # ================================ #
-        # old version with pose_landmarks  #
-        # ================================ #
-
-        # Draw
-        # solutions.drawing_utils.draw_landmarks(
-        #     annotated_image,
-        #     pose_landmarks_proto,
-        #     solutions.pose.POSE_CONNECTIONS,
-        #     # landmark_drawing_spec=None,
-        #     solutions.drawing_styles.get_default_pose_landmarks_style()
-        # )
-
-        # cv2.putText(annotated_image, f"{int(body.left_elbow_angle())}", (int(pose_landmarks[PoseLandmark.LEFT_ELBOW].x * frame_width), int(pose_landmarks[PoseLandmark.LEFT_ELBOW].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-        # cv2.putText(annotated_image, f"{int(body.right_elbow_angle())}", (int(pose_landmarks[PoseLandmark.RIGHT_ELBOW].x * frame_width), int(pose_landmarks[PoseLandmark.RIGHT_ELBOW].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-        # cv2.putText(annotated_image, f"{int(body.left_knee_angle())}", (int(pose_landmarks[PoseLandmark.LEFT_KNEE].x * frame_width), int(pose_landmarks[PoseLandmark.LEFT_KNEE].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-        # cv2.putText(annotated_image, f"{int(body.right_knee_angle())}", (int(pose_landmarks[PoseLandmark.RIGHT_KNEE].x * frame_width), int(pose_landmarks[PoseLandmark.RIGHT_KNEE].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-        # cv2.putText(annotated_image, f"{int(body.left_shoulder_angle())}", (int(pose_landmarks[PoseLandmark.LEFT_SHOULDER].x * frame_width), int(pose_landmarks[PoseLandmark.LEFT_SHOULDER].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-        # cv2.putText(annotated_image, f"{int(body.right_shoulder_angle())}", (int(pose_landmarks[PoseLandmark.RIGHT_SHOULDER].x * frame_width), int(pose_landmarks[PoseLandmark.RIGHT_SHOULDER].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-        # cv2.putText(annotated_image, f"{int(body.left_hip_angle())}", (int(pose_landmarks[PoseLandmark.LEFT_HIP].x * frame_width), int(pose_landmarks[PoseLandmark.LEFT_HIP].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-        # cv2.putText(annotated_image, f"{int(body.right_hip_angle())}", (int(pose_landmarks[PoseLandmark.RIGHT_HIP].x * frame_width), int(pose_landmarks[PoseLandmark.RIGHT_HIP].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+        annotate_body(annotated_image)
 
         # detected_poses = detect_pose(body)
         # for i, pose in enumerate(detected_poses):
@@ -113,12 +39,100 @@ def draw_landmarks_on_image(rgb_image, detection_result):
 
     return annotated_image
 
+def annotate_body(annotated_image):
+    # =============================== #
+    # new version with body smoothing #
+    # ================================#
+
+    nose = body.parts[BodyParts.HEAD].nose
+    left_eye = body.parts[BodyParts.HEAD].left_eye
+    right_eye = body.parts[BodyParts.HEAD].right_eye
+    left_shoulder = body.parts[BodyParts.LEFT_ARM].shoulder
+    left_elbow = body.parts[BodyParts.LEFT_ARM].elbow
+    left_wrist = body.parts[BodyParts.LEFT_ARM].wrist
+    right_shoulder = body.parts[BodyParts.RIGHT_ARM].shoulder
+    right_elbow = body.parts[BodyParts.RIGHT_ARM].elbow
+    right_wrist = body.parts[BodyParts.RIGHT_ARM].wrist
+    left_hip = body.parts[BodyParts.LEFT_LEG].hip
+    left_knee = body.parts[BodyParts.LEFT_LEG].knee
+    left_ankle = body.parts[BodyParts.LEFT_LEG].ankle
+    right_hip = body.parts[BodyParts.RIGHT_LEG].hip
+    right_knee = body.parts[BodyParts.RIGHT_LEG].knee
+    right_ankle = body.parts[BodyParts.RIGHT_LEG].ankle
+
+    # Draw the smoothed landmarks
+    cv2.line(annotated_image, (left_shoulder.x, left_shoulder.y), (left_elbow.x, left_elbow.y), (255, 0, 0), 2)
+    cv2.line(annotated_image, (left_elbow.x, left_elbow.y), (left_wrist.x, left_wrist.y), (255, 0, 0), 2)
+    cv2.line(annotated_image, (right_shoulder.x, right_shoulder.y), (right_elbow.x, right_elbow.y), (0, 255, 0), 2)
+    cv2.line(annotated_image, (right_elbow.x, right_elbow.y), (right_wrist.x, right_wrist.y), (0, 255, 0), 2)
+    cv2.line(annotated_image, (left_hip.x, left_hip.y), (left_knee.x, left_knee.y), (0, 0, 255), 2)
+    cv2.line(annotated_image, (left_knee.x, left_knee.y), (left_ankle.x, left_ankle.y), (0, 0, 255), 2)
+    cv2.line(annotated_image, (right_hip.x, right_hip.y), (right_knee.x, right_knee.y), (255, 255, 0), 2)
+    cv2.line(annotated_image, (right_knee.x, right_knee.y), (right_ankle.x, right_ankle.y), (255, 255, 0), 2)
+    cv2.line(annotated_image, (left_shoulder.x, left_shoulder.y), (left_hip.x, left_hip.y), (0, 255, 255), 2)
+    cv2.line(annotated_image, (right_shoulder.x, right_shoulder.y), (right_hip.x, right_hip.y), (0, 255, 255), 2)
+    cv2.line(annotated_image, (left_shoulder.x, left_shoulder.y), (right_shoulder.x, right_shoulder.y), (255, 0, 255),
+             2)
+    cv2.line(annotated_image, (left_hip.x, left_hip.y), (right_hip.x, right_hip.y), (255, 0, 255), 2)
+    cv2.circle(annotated_image, (nose.x, nose.y), 5, (0, 255, 255), -1)
+    cv2.circle(annotated_image, (left_eye.x, left_eye.y), 5, (255, 0, 255), -1)
+    cv2.circle(annotated_image, (right_eye.x, right_eye.y), 5, (255, 0, 255), -1)
+
+    # Draw angles on the image
+    cv2.putText(annotated_image, f"{int(body.left_elbow_angle())}", (left_elbow.x, left_elbow.y),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.right_elbow_angle())}", (right_elbow.x, right_elbow.y),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.left_knee_angle())}", (left_knee.x, left_knee.y), cv2.FONT_HERSHEY_SIMPLEX,
+                0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.right_knee_angle())}", (right_knee.x, right_knee.y),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.left_shoulder_angle())}", (left_shoulder.x, left_shoulder.y),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.right_shoulder_angle())}", (right_shoulder.x, right_shoulder.y),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.left_hip_angle())}", (left_hip.x, left_hip.y), cv2.FONT_HERSHEY_SIMPLEX,
+                0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.right_hip_angle())}", (right_hip.x, right_hip.y), cv2.FONT_HERSHEY_SIMPLEX,
+                0.6, (0, 255, 0), 2)
+
+def annotate_body_old(annotated_image, pose_landmarks):
+    # ================================ #
+    # old version with pose_landmarks  #
+    # ================================ #
+
+    # Convert to protobuf
+    pose_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
+    pose_landmarks_proto.landmark.extend([
+        landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z)
+        for landmark in pose_landmarks
+    ])
+
+    # Draw
+    solutions.drawing_utils.draw_landmarks(
+        annotated_image,
+        pose_landmarks_proto,
+        solutions.pose.POSE_CONNECTIONS,
+        # landmark_drawing_spec=None,
+        solutions.drawing_styles.get_default_pose_landmarks_style()
+    )
+
+    cv2.putText(annotated_image, f"{int(body.left_elbow_angle())}", (int(pose_landmarks[PoseLandmark.LEFT_ELBOW].x * frame_width), int(pose_landmarks[PoseLandmark.LEFT_ELBOW].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.right_elbow_angle())}", (int(pose_landmarks[PoseLandmark.RIGHT_ELBOW].x * frame_width), int(pose_landmarks[PoseLandmark.RIGHT_ELBOW].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.left_knee_angle())}", (int(pose_landmarks[PoseLandmark.LEFT_KNEE].x * frame_width), int(pose_landmarks[PoseLandmark.LEFT_KNEE].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.right_knee_angle())}", (int(pose_landmarks[PoseLandmark.RIGHT_KNEE].x * frame_width), int(pose_landmarks[PoseLandmark.RIGHT_KNEE].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.left_shoulder_angle())}", (int(pose_landmarks[PoseLandmark.LEFT_SHOULDER].x * frame_width), int(pose_landmarks[PoseLandmark.LEFT_SHOULDER].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.right_shoulder_angle())}", (int(pose_landmarks[PoseLandmark.RIGHT_SHOULDER].x * frame_width), int(pose_landmarks[PoseLandmark.RIGHT_SHOULDER].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.left_hip_angle())}", (int(pose_landmarks[PoseLandmark.LEFT_HIP].x * frame_width), int(pose_landmarks[PoseLandmark.LEFT_HIP].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+    cv2.putText(annotated_image, f"{int(body.right_hip_angle())}", (int(pose_landmarks[PoseLandmark.RIGHT_HIP].x * frame_width), int(pose_landmarks[PoseLandmark.RIGHT_HIP].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+
+
+
 # Callback for live stream results
 def result_callback(result: vision.PoseLandmarkerResult, output_image: mp.Image, timestamp_ms: int):
     global annotated_frame
     rgb_view = output_image.numpy_view()
     annotated_frame = draw_landmarks_on_image(rgb_view, result)
-    # annotated_frame = output_image.numpy_view()
 
 
 def run_live_stream():
@@ -140,8 +154,9 @@ def run_live_stream():
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
     cap.set(cv2.CAP_PROP_FPS, FPS)
-    cv2.namedWindow("Mediapipe Pose Live", cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Mediapipe Pose Live", 1920, 1080)
+    if LAPTOP:
+        cv2.namedWindow("Mediapipe Pose Live", cv2.WINDOW_NORMAL)
+        cv2.resizeWindow("Mediapipe Pose Live", 1920, 1080)
 
     if not cap.isOpened():
         print("Error: Could not open camera.")
@@ -197,7 +212,8 @@ def run_live_stream():
         # Show annotated frame if available
         frame_to_draw = annotated_frame
         if frame_to_draw is not None:
-            frame_to_draw = cv2.resize(frame_to_draw, (2560, 1440))
+            if LAPTOP:
+                frame_to_draw = cv2.resize(frame_to_draw, (2560, 1440))
             cv2.imshow("Mediapipe Pose Live", cv2.cvtColor(frame_to_draw, cv2.COLOR_RGB2BGR))
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
