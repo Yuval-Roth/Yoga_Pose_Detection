@@ -80,25 +80,25 @@ class Body:
         return left_knee.center_between(right_knee)
 
     def left_shoulder_angle(self):
-        return 180 + Vec2.angle(self.parts[BodyParts.LEFT_ARM].first.vector, self.parts[BodyParts.TORSO].left.vector)
+        return 180 + Vec2.angle(self.parts[BodyParts.LEFT_ARM].first.vector(), self.parts[BodyParts.TORSO].left.vector())
 
     def right_shoulder_angle(self):
-        return 180 + Vec2.angle(self.parts[BodyParts.TORSO].right.vector, self.parts[BodyParts.RIGHT_ARM].first.vector)
+        return 180 + Vec2.angle(self.parts[BodyParts.TORSO].right.vector(), self.parts[BodyParts.RIGHT_ARM].first.vector())
 
     def left_elbow_angle(self):
-        return 180 - Vec2.angle(self.parts[BodyParts.LEFT_ARM].first.vector, self.parts[BodyParts.LEFT_ARM].second.vector)
+        return 180 - Vec2.angle(self.parts[BodyParts.LEFT_ARM].first.vector(), self.parts[BodyParts.LEFT_ARM].second.vector())
 
     def right_elbow_angle(self):
-        return 180 - Vec2.angle(self.parts[BodyParts.RIGHT_ARM].second.vector, self.parts[BodyParts.RIGHT_ARM].first.vector)
+        return 180 - Vec2.angle(self.parts[BodyParts.RIGHT_ARM].second.vector(), self.parts[BodyParts.RIGHT_ARM].first.vector())
 
     def left_hip_angle(self):
-        return 180 - Vec2.angle(self.parts[BodyParts.TORSO].left.vector, self.parts[BodyParts.LEFT_LEG].first.vector)
+        return 180 - Vec2.angle(self.parts[BodyParts.TORSO].left.vector(), self.parts[BodyParts.LEFT_LEG].first.vector())
 
     def right_hip_angle(self):
-        return 180 - Vec2.angle(self.parts[BodyParts.RIGHT_LEG].first.vector, self.parts[BodyParts.TORSO].right.vector)
+        return 180 - Vec2.angle(self.parts[BodyParts.RIGHT_LEG].first.vector(), self.parts[BodyParts.TORSO].right.vector())
 
     def left_knee_angle(self):
-        return 180 - Vec2.angle(self.parts[BodyParts.LEFT_LEG].second.vector, self.parts[BodyParts.LEFT_LEG].first.vector)
+        return 180 - Vec2.angle(self.parts[BodyParts.LEFT_LEG].second.vector(), self.parts[BodyParts.LEFT_LEG].first.vector())
 
     def right_knee_angle(self):
-        return 180 - Vec2.angle(self.parts[BodyParts.RIGHT_LEG].first.vector, self.parts[BodyParts.RIGHT_LEG].second.vector)
+        return 180 - Vec2.angle(self.parts[BodyParts.RIGHT_LEG].first.vector(), self.parts[BodyParts.RIGHT_LEG].second.vector())
