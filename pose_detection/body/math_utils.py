@@ -20,6 +20,12 @@ class Vec2:
     def __sub__(self, other):
         return Vec2(self.x - other.x, self.y - other.y)
 
+    def __add__(self, other):
+        return Vec2(self.x + other.x, self.y + other.y)
+
+    def center_between(self, other: 'Vec2'):
+        return Vec2((self.x + other.x) / 2, (self.y + other.y) / 2)
+
     def magnitude(self):
         return math.sqrt(self.x ** 2 + self.y ** 2)
 
@@ -29,7 +35,6 @@ class Vec2:
 
     def __repr__(self):
         return f"({self.x:.2f}, {self.y:.2f})"
-
 
     @staticmethod
     def angle(v1, v2):
@@ -56,6 +61,45 @@ class Vec2:
 
         return math.degrees(angle_rad)
 
+
+class Vec2Avg(Vec2):
+    def __init__(self, count):
+        super().__init__(0, 0)
+        self.count = count
+        self.currentCount = 0
+        self.vectors = []
+        self.x_sum = 0
+        self.y_sum = 0
+
+    def add_vec2(self, vec: Vec2):
+        self.add_point(vec.x, vec.y)
+
+    def add_point(self,x: int, y: int):
+        vec = Vec2(x, y)
+        if self.currentCount < self.count:
+            self.currentCount += 1
+        else:
+            old_vec = self.vectors.pop(0)
+            self.x_sum -= old_vec.x
+            self.y_sum -= old_vec.y
+        self.vectors.append(vec)
+        self.x_sum += x
+        self.y_sum += y
+        self.x = int(self.x_sum / self.currentCount)
+        self.y = int(self.y_sum / self.currentCount)
+
+class Vec2Pair:
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
+
+    def vector(self):
+        return (self.end - self.start).normalize()
+
+    def center(self):
+        self.start.center_between(self.end)
+
+
 def angle_diff(first, second):
     """
     Calculate the smallest difference in angle between two vectors in degrees.
@@ -65,9 +109,3 @@ def angle_diff(first, second):
     return diff if diff <= 180 else 360 - diff
 
 
-if __name__ == "__main__":
-    v1 = Vec2(1, 0)
-    v2 = Vec2(0, 1)
-    print("Angle between v1 and v2:", Vec2.angle(v1, v2))  # Should be 90 degrees
-    print("Angle difference between 30 and 150:", angle_diff(30, 150))  # Should be 120 degrees
-    print("Angle difference between 350 and 10:", angle_diff(350, 10))  # Should be 20 degrees

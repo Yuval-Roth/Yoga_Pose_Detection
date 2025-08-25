@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, List
 
 from body.body import Body
 from body.math_utils import angle_diff
@@ -221,30 +221,30 @@ def is_shark(body: Body) -> bool:
     return left_arm_straight2 and right_arm_straight2 and left_knee_angle_ok2 and right_knee_angle_ok2 and left_shoulder_angle_ok2 and right_shoulder_angle_ok2 and left_hip_angle_ok2 and right_hip_angle_ok2 and shoulders_height_close_to_knees2
 
 
-def detect_pose(body: Body) -> Tuple[bool, str]:
+def detect_pose(body: Body) -> List[str]:
     """
     Detect the pose of the body and return a tuple indicating if a pose is detected and its name.
-
 
     returns:
         Tuple[bool, str]: (is_pose_detected, pose_name)
     """
+
+    detected_poses = []
     if is_warrior2(body):
-        return True, "Warrior II Pose"
+        detected_poses.append("Warrior II")
     if is_tree(body):
-        return True, "Tree Pose"
+        detected_poses.append("Tree")
     if is_downward_dog(body):
-        return True, "Downward Dog Pose"
+        detected_poses.append("Downward Dog")
     if is_snake(body):
-        return True, "Snake Pose"
+        detected_poses.append("Snake")
     if is_cat(body):
-        return True, "Cat Pose"
+        detected_poses.append("Cat")
     if is_frog(body):
-        return True, "Frog Pose"
+        detected_poses.append("Frog")
     if is_shark(body):
-        return True, "Shark Pose"
+        detected_poses.append("Shark")
 
+    return detected_poses
 
-
-    return False, "No Recognized Pose"
 

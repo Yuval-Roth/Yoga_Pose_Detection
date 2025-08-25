@@ -1,71 +1,6 @@
 from enum import Enum
 
-from mediapipe.python.solutions.pose import PoseLandmark
-
-from body.math_utils import Vec2
-
-
-class Arm:
-    def __init__(self, shoulder: Vec2, elbow: Vec2, wrist: Vec2):
-        self.first = BodyPart(shoulder, elbow)
-        self.second = BodyPart(elbow, wrist)
-
-
-class Leg:
-    def __init__(self, hip: Vec2, knee: Vec2, ankle: Vec2):
-        self.first = BodyPart(hip, knee)
-        self.second = BodyPart(knee, ankle)
-
-
-class Torso:
-    def __init__(self, left_shoulder: Vec2, right_shoulder: Vec2, left_hip: Vec2, right_hip: Vec2):
-        self.right = BodyPart(right_shoulder, right_hip)
-        self.left = BodyPart(left_shoulder, left_hip)
-
-class Head:
-    def __init__(self, nose: Vec2, left_eye: Vec2, right_eye: Vec2):
-
-        # Center of the head
-        self.center = Vec2(
-            (nose.x + left_eye.x + right_eye.x) / 3,
-            (nose.y + left_eye.y + right_eye.y) / 3
-        )
-
-        # Vectors along the head plane
-        u = left_eye - nose
-        v = right_eye - nose
-
-        # Normal vector perpendicular to head plane
-        # self.vector = Vec3.cross2(u, v).normalize()
-
-def build_body_parts(pose_landmarks, width, height):
-    landmarks_dict = dict()
-    for idx, landmark in enumerate(pose_landmarks):
-        landmarks_dict[idx] = Vec2(int(landmark.x * width), int(landmark.y * height))
-
-    body_parts = {
-        BodyParts.LEFT_ARM: Arm(landmarks_dict[PoseLandmark.LEFT_SHOULDER],
-                                landmarks_dict[PoseLandmark.LEFT_ELBOW],
-                                landmarks_dict[PoseLandmark.LEFT_WRIST]),
-        BodyParts.RIGHT_ARM: Arm(landmarks_dict[PoseLandmark.RIGHT_SHOULDER],
-                                 landmarks_dict[PoseLandmark.RIGHT_ELBOW],
-                                 landmarks_dict[PoseLandmark.RIGHT_WRIST]),
-        BodyParts.LEFT_LEG: Leg(landmarks_dict[PoseLandmark.LEFT_HIP],
-                                landmarks_dict[PoseLandmark.LEFT_KNEE],
-                                landmarks_dict[PoseLandmark.LEFT_ANKLE]),
-        BodyParts.RIGHT_LEG: Leg(landmarks_dict[PoseLandmark.RIGHT_HIP],
-                                 landmarks_dict[PoseLandmark.RIGHT_KNEE],
-                                 landmarks_dict[PoseLandmark.RIGHT_ANKLE]),
-        BodyParts.TORSO: Torso(landmarks_dict[PoseLandmark.LEFT_SHOULDER],
-                               landmarks_dict[PoseLandmark.RIGHT_SHOULDER],
-                               landmarks_dict[PoseLandmark.LEFT_HIP],
-                               landmarks_dict[PoseLandmark.RIGHT_HIP]),
-        BodyParts.HEAD: Head(landmarks_dict[PoseLandmark.NOSE],
-                             landmarks_dict[PoseLandmark.LEFT_EYE],
-                             landmarks_dict[PoseLandmark.RIGHT_EYE])
-    }
-
-    return body_parts
+from body.math_utils import Vec2, Vec2Avg, Vec2Pair
 
 
 class BodyParts(Enum):
@@ -76,11 +11,59 @@ class BodyParts(Enum):
     TORSO = "torso"
     HEAD = "head"
 
+class Arm:
+    def __init__(self, avg_count: int):
+        self.shoulder = Vec2Avg(avg_count)
+        self.elbow = Vec2Avg(avg_count)
+        self.wrist = Vec2Avg(avg_count)
+        self.first = Vec2Pair(self.shoulder, self.elbow)
+        self.second = Vec2Pair(self.elbow, self.wrist)
 
-class BodyPart:
-    def __init__(self, start, end):
-        self.vector = (Vec2(end.x, start.y) - Vec2(start.x, end.y)).normalize()
-        self.center = Vec2(
-            int((start.x + end.x) / 2),
-            int((start.y + end.y) / 2)
-        )
+    def update(self, shoulder, elbow, wrist):
+        self.shoulder.add_point(shoulder.x, shoulder.y)
+        self.elbow.add_point(elbow.x, elbow.y)
+        self.wrist.add_point(wrist.x, wrist.y)
+
+
+class Leg:
+    def __init__(self, avg_count: int):
+        self.hip = Vec2Avg(avg_count)
+        self.knee = Vec2Avg(avg_count)
+        self.ankle = Vec2Avg(avg_count)
+        self.first = Vec2Pair(self.hip, self.knee)
+        self.second = Vec2Pair(self.knee, self.ankle)
+
+    def update(self, hip, knee, ankle):
+        self.hip.add_point(hip.x, hip.y)
+        self.knee.add_point(knee.x, knee.y)
+        self.ankle.add_point(ankle.x, ankle.y)
+
+
+class Torso:
+    def __init__(self, avg_count: int):
+        self.right_shoulder = Vec2Avg(avg_count)
+        self.left_shoulder = Vec2Avg(avg_count)
+        self.right_hip = Vec2Avg(avg_count)
+        self.left_hip = Vec2Avg(avg_count)
+        self.right = Vec2Pair(self.right_shoulder, self.right_hip)
+        self.left = Vec2Pair(self.left_shoulder, self.left_hip)
+
+    def update(self, left_shoulder, right_shoulder, left_hip, right_hip):
+        self.left_shoulder.add_point(left_shoulder.x, left_shoulder.y)
+        self.right_shoulder.add_point(right_shoulder.x, right_shoulder.y)
+        self.left_hip.add_point(left_hip.x, left_hip.y)
+        self.right_hip.add_point(right_hip.x, right_hip.y)
+
+
+
+class Head:
+    def __init__(self, avg_count: int):
+        self.nose = Vec2Avg(avg_count)
+        self.left_eye = Vec2Avg(avg_count)
+        self.right_eye = Vec2Avg(avg_count)
+
+    def update(self, nose, left_eye, right_eye):
+        self.nose.add_point(nose.x, nose.y)
+        self.left_eye.add_point(left_eye.x, left_eye.y)
+        self.right_eye.add_point(right_eye.x, right_eye.y)
+

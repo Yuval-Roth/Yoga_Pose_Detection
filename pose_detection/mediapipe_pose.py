@@ -9,11 +9,15 @@ from mediapipe.tasks.python import vision
 import numpy as np
 
 from body.body import Body
+from body.body_parts import *
 from pose_detection import detect_pose
 
 FPS = 60
 TIMESTAMP_STEP = int(1000 / FPS)
 timestamp = 0
+frame_width, frame_height = 1280, 720
+# frame_width, frame_height = 1920, 1080
+body = Body(frame_width, frame_height, avg_count=15)
 
 # Global variable to hold last annotated frame
 annotated_frame: Optional[np.ndarray[Any, np.dtype[Any]]] = None
@@ -33,31 +37,90 @@ def draw_landmarks_on_image(rgb_image, detection_result):
         ])
 
         # Draw
-        solutions.drawing_utils.draw_landmarks(
-            annotated_image,
-            pose_landmarks_proto,
-            solutions.pose.POSE_CONNECTIONS,
-            # landmark_drawing_spec=None,
-            solutions.drawing_styles.get_default_pose_landmarks_style()
-        )
+        # solutions.drawing_utils.draw_landmarks(
+        #     annotated_image,
+        #     pose_landmarks_proto,
+        #     solutions.pose.POSE_CONNECTIONS,
+        #     # landmark_drawing_spec=None,
+        #     solutions.drawing_styles.get_default_pose_landmarks_style()
+        # )
 
-        h,w, _ = annotated_image.shape
-        body = Body(pose_landmarks, w, h)
+        body.update(pose_landmarks)
+
+        # Draw the smoothed landmarks
+        # left arm
+        # cv2.line(annotated_image, (body.parts[BodyParts.LEFT_ARM].shoulder.x, body.parts[BodyParts.LEFT_ARM].shoulder.y),
+        #          (body.parts[BodyParts.LEFT_ARM].elbow.x, body.parts[BodyParts.LEFT_ARM].elbow.y), (255, 0, 0), 6)
+        # cv2.line(annotated_image, (body.parts[BodyParts.LEFT_ARM].elbow.x, body.parts[BodyParts.LEFT_ARM].elbow.y),
+        #          (body.parts[BodyParts.LEFT_ARM].wrist.x, body.parts[BodyParts.LEFT_ARM].wrist.y), (255, 0, 0), 6)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.LEFT_ARM].shoulder.x, body.parts[BodyParts.LEFT_ARM].shoulder.y), 8, (0, 0, 255), -1)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.LEFT_ARM].elbow.x, body.parts[BodyParts.LEFT_ARM].elbow.y), 8, (0, 0, 255), -1)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.LEFT_ARM].wrist.x, body.parts[BodyParts.LEFT_ARM].wrist.y), 8, (0, 0, 255), -1)
+        # # right arm
+        # cv2.line(annotated_image, (body.parts[BodyParts.RIGHT_ARM].shoulder.x, body.parts[BodyParts.RIGHT_ARM].shoulder.y),
+        #          (body.parts[BodyParts.RIGHT_ARM].elbow.x, body.parts[BodyParts.RIGHT_ARM].elbow.y), (255, 0, 0), 6)
+        # cv2.line(annotated_image, (body.parts[BodyParts.RIGHT_ARM].elbow.x, body.parts[BodyParts.RIGHT_ARM].elbow.y),
+        #          (body.parts[BodyParts.RIGHT_ARM].wrist.x, body.parts[BodyParts.RIGHT_ARM].wrist.y), (255, 0, 0), 6)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.RIGHT_ARM].shoulder.x, body.parts[BodyParts.RIGHT_ARM].shoulder.y), 8, (0, 0, 255), -1)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.RIGHT_ARM].elbow.x, body.parts[BodyParts.RIGHT_ARM].elbow.y), 8, (0, 0, 255), -1)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.RIGHT_ARM].wrist.x, body.parts[BodyParts.RIGHT_ARM].wrist.y), 8, (0, 0, 255), -1)
+        # # left leg
+        # cv2.line(annotated_image, (body.parts[BodyParts.LEFT_LEG].hip.x, body.parts[BodyParts.LEFT_LEG].hip.y),
+        #          (body.parts[BodyParts.LEFT_LEG].knee.x, body.parts[BodyParts.LEFT_LEG].knee.y), (255, 0, 0), 6)
+        # cv2.line(annotated_image, (body.parts[BodyParts.LEFT_LEG].knee.x, body.parts[BodyParts.LEFT_LEG].knee.y),
+        #          (body.parts[BodyParts.LEFT_LEG].ankle.x, body.parts[BodyParts.LEFT_LEG].ankle.y), (255, 0, 0), 6)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.LEFT_LEG].hip.x, body.parts[BodyParts.LEFT_LEG].hip.y), 8, (0, 0, 255), -1)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.LEFT_LEG].knee.x, body.parts[BodyParts.LEFT_LEG].knee.y), 8, (0, 0, 255), -1)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.LEFT_LEG].ankle.x, body.parts[BodyParts.LEFT_LEG].ankle.y), 8, (0, 0, 255), -1)
+        # # right leg
+        # cv2.line(annotated_image, (body.parts[BodyParts.RIGHT_LEG].hip.x, body.parts[BodyParts.RIGHT_LEG].hip.y),
+        #          (body.parts[BodyParts.RIGHT_LEG].knee.x, body.parts[BodyParts.RIGHT_LEG].knee.y), (255, 0, 0), 6)
+        # cv2.line(annotated_image, (body.parts[BodyParts.RIGHT_LEG].knee.x, body.parts[BodyParts.RIGHT_LEG].knee.y),
+        #          (body.parts[BodyParts.RIGHT_LEG].ankle.x, body.parts[BodyParts.RIGHT_LEG].ankle.y), (255, 0, 0), 6)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.RIGHT_LEG].hip.x, body.parts[BodyParts.RIGHT_LEG].hip.y), 8, (0, 0, 255), -1)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.RIGHT_LEG].knee.x, body.parts[BodyParts.RIGHT_LEG].knee.y), 8, (0, 0, 255), -1)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.RIGHT_LEG].ankle.x, body.parts[BodyParts.RIGHT_LEG].ankle.y), 8, (0, 0, 255), -1)
+        # # torso
+        # cv2.line(annotated_image, (body.parts[BodyParts.TORSO].left_shoulder.x, body.parts[BodyParts.TORSO].left_shoulder.y),
+        #          (body.parts[BodyParts.TORSO].right_shoulder.x, body.parts[BodyParts.TORSO].right_shoulder.y), (255, 0, 0), 6)
+        # cv2.line(annotated_image, (body.parts[BodyParts.TORSO].left_hip.x, body.parts[BodyParts.TORSO].left_hip.y),
+        #          (body.parts[BodyParts.TORSO].right_hip.x, body.parts[BodyParts.TORSO].right_hip.y), (255, 0, 0), 6)
+        # cv2.line(annotated_image, (body.parts[BodyParts.TORSO].left_shoulder.x, body.parts[BodyParts.TORSO].left_shoulder.y),
+        #          (body.parts[BodyParts.TORSO].left_hip.x, body.parts[BodyParts.TORSO].left_hip.y), (255, 0, 0), 6)
+        # cv2.line(annotated_image, (body.parts[BodyParts.TORSO].right_shoulder.x, body.parts[BodyParts.TORSO].right_shoulder.y),
+        #          (body.parts[BodyParts.TORSO].right_hip.x, body.parts[BodyParts.TORSO].right_hip.y), (255, 0, 0), 6)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.TORSO].left_shoulder.x, body.parts[BodyParts.TORSO].left_shoulder.y), 8, (0, 0, 255), -1)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.TORSO].right_shoulder.x, body.parts[BodyParts.TORSO].right_shoulder.y), 8, (0, 0, 255), -1)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.TORSO].left_hip.x, body.parts[BodyParts.TORSO].left_hip.y), 8, (0, 0, 255), -1)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.TORSO].right_hip.x, body.parts[BodyParts.TORSO].right_hip.y), 8, (0, 0, 255), -1)
+        # # head
+        # cv2.line(annotated_image, (body.parts[BodyParts.HEAD].nose.x, body.parts[BodyParts.HEAD].nose.y),
+        #          (body.parts[BodyParts.HEAD].left_eye.x, body.parts[BodyParts.HEAD].left_eye.y), (255, 0, 0), 6)
+        # cv2.line(annotated_image, (body.parts[BodyParts.HEAD].nose.x, body.parts[BodyParts.HEAD].nose.y),
+        #          (body.parts[BodyParts.HEAD].right_eye.x, body.parts[BodyParts.HEAD].right_eye.y), (255, 0, 0), 6)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.HEAD].nose.x, body.parts[BodyParts.HEAD].nose.y), 8, (0, 0, 255), -1)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.HEAD].left_eye.x, body.parts[BodyParts.HEAD].left_eye.y), 8, (0, 0, 255), -1)
+        # cv2.circle(annotated_image, (body.parts[BodyParts.HEAD].right_eye.x, body.parts[BodyParts.HEAD].right_eye.y), 8, (0, 0, 255), -1)
+        # # Draw centers
+        # cv2.circle(annotated_image, (body.hips_center().x, body.hips_center().y), 10, (255, 255, 0), -1)
+        # cv2.circle(annotated_image, (body.shoulders_center().x, body.shoulders_center().y), 10, (255, 255, 0), -1)
+        # cv2.circle(annotated_image, (body.knees_center().x, body.knees_center().y), 10, (255, 255, 0), -1)
+        # cv2.circle(annotated_image, (body.face_center().x, body.face_center().y), 10, (255, 255, 0), -1)
 
 
         # Draw angles on the image
-        cv2.putText(annotated_image, f"{int(body.left_elbow_angle())}", (int(pose_landmarks[PoseLandmark.LEFT_ELBOW].x * w), int(pose_landmarks[PoseLandmark.LEFT_ELBOW].y * h)),cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-        cv2.putText(annotated_image, f"{int(body.right_elbow_angle())}", (int(pose_landmarks[PoseLandmark.RIGHT_ELBOW].x * w), int(pose_landmarks[PoseLandmark.RIGHT_ELBOW].y * h)),cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-        cv2.putText(annotated_image, f"{int(body.left_knee_angle())}", (int(pose_landmarks[PoseLandmark.LEFT_KNEE].x * w), int(pose_landmarks[PoseLandmark.LEFT_KNEE].y * h)),cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-        cv2.putText(annotated_image, f"{int(body.right_knee_angle())}", (int(pose_landmarks[PoseLandmark.RIGHT_KNEE].x * w), int(pose_landmarks[PoseLandmark.RIGHT_KNEE].y * h)),cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-        cv2.putText(annotated_image, f"{int(body.left_shoulder_angle())}", (int(pose_landmarks[PoseLandmark.LEFT_SHOULDER].x * w), int(pose_landmarks[PoseLandmark.LEFT_SHOULDER].y * h)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-        cv2.putText(annotated_image, f"{int(body.right_shoulder_angle())}", (int(pose_landmarks[PoseLandmark.RIGHT_SHOULDER].x * w), int(pose_landmarks[PoseLandmark.RIGHT_SHOULDER].y * h)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-        cv2.putText(annotated_image, f"{int(body.left_hip_angle())}", (int(pose_landmarks[PoseLandmark.LEFT_HIP].x * w), int(pose_landmarks[PoseLandmark.LEFT_HIP].y * h)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-        cv2.putText(annotated_image, f"{int(body.right_hip_angle())}", (int(pose_landmarks[PoseLandmark.RIGHT_HIP].x * w), int(pose_landmarks[PoseLandmark.RIGHT_HIP].y * h)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+        cv2.putText(annotated_image, f"{int(body.left_elbow_angle())}", (int(pose_landmarks[PoseLandmark.LEFT_ELBOW].x * frame_width), int(pose_landmarks[PoseLandmark.LEFT_ELBOW].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(body.right_elbow_angle())}", (int(pose_landmarks[PoseLandmark.RIGHT_ELBOW].x * frame_width), int(pose_landmarks[PoseLandmark.RIGHT_ELBOW].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(body.left_knee_angle())}", (int(pose_landmarks[PoseLandmark.LEFT_KNEE].x * frame_width), int(pose_landmarks[PoseLandmark.LEFT_KNEE].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(body.right_knee_angle())}", (int(pose_landmarks[PoseLandmark.RIGHT_KNEE].x * frame_width), int(pose_landmarks[PoseLandmark.RIGHT_KNEE].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(body.left_shoulder_angle())}", (int(pose_landmarks[PoseLandmark.LEFT_SHOULDER].x * frame_width), int(pose_landmarks[PoseLandmark.LEFT_SHOULDER].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(body.right_shoulder_angle())}", (int(pose_landmarks[PoseLandmark.RIGHT_SHOULDER].x * frame_width), int(pose_landmarks[PoseLandmark.RIGHT_SHOULDER].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(body.left_hip_angle())}", (int(pose_landmarks[PoseLandmark.LEFT_HIP].x * frame_width), int(pose_landmarks[PoseLandmark.LEFT_HIP].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(body.right_hip_angle())}", (int(pose_landmarks[PoseLandmark.RIGHT_HIP].x * frame_width), int(pose_landmarks[PoseLandmark.RIGHT_HIP].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
-        detected,pose = detect_pose(body)
-        if detected:
-            cv2.putText(annotated_image, f"{pose}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        detected_poses = detect_pose(body)
+        for i, pose in enumerate(detected_poses):
+            cv2.putText(annotated_image, f"{pose}", (50, 50 + 30 * i), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
 
     return annotated_image
 
@@ -74,15 +137,16 @@ def run_live_stream():
     # Open webcam
     camera_index = 1
     cap = cv2.VideoCapture(camera_index)
-    while not cap.isOpened():
+    while not cap.isOpened() and camera_index < 10:
         camera_index += 1
         cap = cv2.VideoCapture(camera_index)
         print(f"Camera not found in index {camera_index}, retrying...")
 
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+    if not cap.isOpened():
+        cap = cv2.VideoCapture(0)
+
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
     cap.set(cv2.CAP_PROP_FPS, FPS)
     cv2.namedWindow("Mediapipe Pose Live", cv2.WINDOW_NORMAL)
     cv2.resizeWindow("Mediapipe Pose Live", 1920, 1080)
@@ -104,7 +168,20 @@ def run_live_stream():
         output_segmentation_masks=False,
         num_poses=5
     )
-    detector = vision.PoseLandmarker.create_from_options(options)
+    try:
+        detector = vision.PoseLandmarker.create_from_options(options)
+    except NotImplementedError:
+        base_options = python.BaseOptions(
+            model_asset_path="model/pose_landmarker_heavy.task"
+        )
+        options = vision.PoseLandmarkerOptions(
+            base_options=base_options,
+            running_mode=vision.RunningMode.LIVE_STREAM,
+            result_callback=result_callback,
+            output_segmentation_masks=False,
+            num_poses=5
+        )
+        detector = vision.PoseLandmarker.create_from_options(options)
 
     global timestamp
     while True:
