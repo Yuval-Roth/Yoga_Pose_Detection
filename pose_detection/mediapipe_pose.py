@@ -12,13 +12,13 @@ from body.body import Body
 from body.body_parts import *
 from pose_detection import detect_pose
 
-LAPTOP = False
+LAPTOP = True
 FPS = 60
 TIMESTAMP_STEP = int(1000 / FPS)
 timestamp = 0
 frame_width, frame_height = 1280, 720
 # frame_width, frame_height = 1920, 1080
-body = Body(frame_width, frame_height, avg_count=10)
+body = Body(frame_width, frame_height, avg_count=6)
 
 # Global variable to hold last annotated frame
 annotated_frame: Optional[np.ndarray[Any, np.dtype[Any]]] = None
