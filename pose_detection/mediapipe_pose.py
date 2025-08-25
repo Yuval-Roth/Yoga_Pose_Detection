@@ -118,6 +118,7 @@ def result_callback(result: vision.PoseLandmarkerResult, output_image: mp.Image,
     global annotated_frame
     rgb_view = output_image.numpy_view()
     annotated_frame = draw_landmarks_on_image(rgb_view, result)
+    # annotated_frame = output_image.numpy_view()
 
 
 def run_live_stream():
@@ -134,11 +135,13 @@ def run_live_stream():
     if not cap.isOpened():
         cap = cv2.VideoCapture(0)
 
+    # Force MJPG (instead of default YUYV)
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
     cap.set(cv2.CAP_PROP_FPS, FPS)
-    # cv2.namedWindow("Mediapipe Pose Live", cv2.WINDOW_NORMAL)
-    # cv2.resizeWindow("Mediapipe Pose Live", 1920, 1080)
+    cv2.namedWindow("Mediapipe Pose Live", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("Mediapipe Pose Live", 1920, 1080)
 
     if not cap.isOpened():
         print("Error: Could not open camera.")
@@ -194,7 +197,7 @@ def run_live_stream():
         # Show annotated frame if available
         frame_to_draw = annotated_frame
         if frame_to_draw is not None:
-            # frame_to_draw = cv2.resize(frame_to_draw, (2560, 1440))
+            frame_to_draw = cv2.resize(frame_to_draw, (2560, 1440))
             cv2.imshow("Mediapipe Pose Live", cv2.cvtColor(frame_to_draw, cv2.COLOR_RGB2BGR))
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
@@ -265,6 +268,30 @@ def run_on_video(video_path: str):
 
     cap.release()
     cv2.destroyAllWindows()
+
+
+def test_fps():
+    import cv2, time
+
+    cap = cv2.VideoCapture(0)
+
+    # Force MJPG (instead of default YUYV)
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+
+    # Warm-up
+    for _ in range(10):
+        cap.read()
+
+    start = time.time()
+    frames = 120
+    for i in range(frames):
+        ret, frame = cap.read()
+    end = time.time()
+
+    print("FPS:", frames / (end - start))
+    cap.release()
 
 
 if __name__ == "__main__":
