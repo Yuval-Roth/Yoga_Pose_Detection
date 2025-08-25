@@ -132,13 +132,19 @@ def run_live_stream():
     # Open webcam
     camera_index = 1
     cap = cv2.VideoCapture(camera_index)
+    print(f"** Searching for camera **")
     while not cap.isOpened() and camera_index < 10:
+        print(f">> Camera not found in index {camera_index}")
         camera_index += 1
         cap = cv2.VideoCapture(camera_index)
-        print(f"Camera not found in index {camera_index}, retrying...")
 
-    if not cap.isOpened():
+    if cap.isOpened():
+        print(f" -- Using camera index {camera_index} -- ")
+    else:
+        print(">> Trying default camera index 0...")
         cap = cv2.VideoCapture(0)
+        if cap.isOpened():
+            print(f" -- Using camera index 0 -- ")
 
     # Force MJPG (instead of default YUYV)
     cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
@@ -169,6 +175,7 @@ def run_live_stream():
     try:
         detector = vision.PoseLandmarker.create_from_options(options)
     except NotImplementedError:
+        print("\nGPU delegate is not supported on this platform, falling back to CPU.\n")
         base_options = python.BaseOptions(
             model_asset_path="model/pose_landmarker_heavy.task"
         )
