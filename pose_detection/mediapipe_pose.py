@@ -10,9 +10,8 @@ import numpy as np
 
 from body.body import Body
 from body.body_parts import *
-from pose_detection import detect_pose
 
-LAPTOP = False
+LAPTOP = True
 FPS = 60
 TIMESTAMP_STEP = int(1000 / FPS)
 timestamp = 0

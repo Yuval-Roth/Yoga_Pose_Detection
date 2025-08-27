@@ -23,17 +23,13 @@ class GenericPoseRule(PoseRule):
 
 
 class RangePoseRule(PoseRule):
-    def __init__(self, target, bottom_tolerance, upper_tolerance, relax_factor=1.0):
-        if relax_factor < 1.0 or relax_factor >= 2.0:
-            raise ValueError("relax_factor must be in the range [1.0, 2.0)")
+    def __init__(self, target: int, bottom_tolerance: int, upper_tolerance: int, bottom_relax_factor: int=0, upper_relax_factor: int = 0):
         self.target = target
         self.bottom_tolerance = bottom_tolerance
         self.upper_tolerance = upper_tolerance
-        self.relax_factor = relax_factor
-        self.satisfied = False
 
     @override
-    def is_satisfied(self, number) -> bool:
+    def is_satisfied(self, number, **should_relax) -> bool:
         if self.satisfied:
             bottom_limit = self.target - self.target * (self.relax_factor - 1.0) - self.bottom_tolerance
             upper_limit = self.target * self.relax_factor + self.upper_tolerance
