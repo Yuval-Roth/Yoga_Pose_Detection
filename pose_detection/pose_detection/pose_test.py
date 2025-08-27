@@ -1,9 +1,10 @@
 from abc import abstractmethod, ABC
 from body.body import Body
-from pose_detection.pose_rules import PoseRule, GenericPoseRule
+from pose_detection.pose_rules import PoseRule
 
 
-class PoseTest(ABC):
+class PoseTest:
+
     def __init__(
             self,
             left_shoulder_angle_rule: PoseRule,
@@ -25,29 +26,26 @@ class PoseTest(ABC):
         self.left_knee_angle_rule = left_knee_angle_rule
         self.right_knee_angle_rule = right_knee_angle_rule
         self.generic_rules = generic_rules
+        self.satisfied = False
 
     def is_satisfied(self, body: Body) -> bool:
         satisfied = True
 
-        if not self.left_shoulder_angle_rule.is_satisfied(body.left_shoulder_angle()):
+        if not (self.left_shoulder_angle_rule.is_satisfied(body.left_shoulder_angle())
+            and self.right_shoulder_angle_rule.is_satisfied(body.right_shoulder_angle())
+            and self.left_elbow_angle_rule.is_satisfied(body.left_elbow_angle())
+            and self.right_elbow_angle_rule.is_satisfied(body.right_elbow_angle())
+            and self.left_hip_angle_rule.is_satisfied(body.left_hip_angle())
+            and self.right_hip_angle_rule.is_satisfied(body.right_hip_angle())
+            and self.left_knee_angle_rule.is_satisfied(body.left_knee_angle())
+            and self.right_knee_angle_rule.is_satisfied(body.right_knee_angle())):
             satisfied = False
-        if not self.right_shoulder_angle_rule.is_satisfied(body.right_shoulder_angle()):
-            satisfied = False
-        if not self.left_elbow_angle_rule.is_satisfied(body.left_elbow_angle()):
-            satisfied = False
-        if not self.right_elbow_angle_rule.is_satisfied(body.right_elbow_angle()):
-            satisfied = False
-        if not self.left_hip_angle_rule.is_satisfied(body.left_hip_angle()):
-            satisfied = False
-        if not self.right_hip_angle_rule.is_satisfied(body.right_hip_angle()):
-            satisfied = False
-        if not self.left_knee_angle_rule.is_satisfied(body.left_knee_angle()):
-            satisfied = False
-        if not self.right_knee_angle_rule.is_satisfied(body.right_knee_angle()):
-            satisfied = False
+
         for rule in self.generic_rules.values():
             if not rule.is_satisfied(body):
                 satisfied = False
+
+        self.satisfied = satisfied
         return satisfied
 
 

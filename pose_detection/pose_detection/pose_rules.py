@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from typing import Callable, override
 
 from body.body import Body
+from body.math_utils import signed_angle_diff
+
 
 class PoseRule(ABC):
     @abstractmethod
@@ -23,17 +25,13 @@ class GenericPoseRule(PoseRule):
 
 
 class RangePoseRule(PoseRule):
-    def __init__(self, target: int, bottom_tolerance: int, upper_tolerance: int, bottom_relax_factor: int=0, upper_relax_factor: int = 0):
+    def __init__(self, target, bottom_tolerance, upper_tolerance):
         self.target = target
         self.bottom_tolerance = bottom_tolerance
         self.upper_tolerance = upper_tolerance
 
     @override
-    def is_satisfied(self, number, **should_relax) -> bool:
-        if self.satisfied:
-            bottom_limit = self.target - self.target * (self.relax_factor - 1.0) - self.bottom_tolerance
-            upper_limit = self.target * self.relax_factor + self.upper_tolerance
-            return self.target - self.target * (self.relax_factor - 1.0)  - self.bottom_tolerance <= number <= self.target * self.relax_factor + self.upper_tolerance
-        else:
-            return self.target - self.bottom_tolerance <= number <= self.target + self.upper_tolerance
+    def is_satisfied(self, number) -> bool:
+        diff = signed_angle_diff(number, self.target)
+        return -self.bottom_tolerance <= diff <= self.upper_tolerance
 

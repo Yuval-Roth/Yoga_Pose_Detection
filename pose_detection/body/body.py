@@ -1,3 +1,5 @@
+from typing import Optional
+
 from mediapipe.python.solutions.pose import PoseLandmark
 
 from body.body_parts import *
@@ -16,6 +18,7 @@ class Body:
             BodyParts.TORSO: Torso(avg_count),
             BodyParts.HEAD: Head(avg_count)
         }
+        self.active_pose: Optional[str]= None
 
     def update(self, pose_landmarks):
         landmarks = dict()

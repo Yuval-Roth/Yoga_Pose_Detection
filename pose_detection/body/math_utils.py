@@ -108,4 +108,15 @@ def angle_diff(first, second):
     diff = abs(first - second) % 360
     return diff if diff <= 180 else 360 - diff
 
+def signed_angle_diff(first, second):
+    """
+    Calculate the signed difference in angle between two vectors in degrees.
+    Positive = clockwise, Negative = counter-clockwise.
+    The result is always between -180 and +180 degrees.
+    """
+    diff = (first - second) % 360
+    if diff > 180:
+        diff -= 360
+    return diff
+
 

@@ -31,10 +31,10 @@ def draw_landmarks_on_image(rgb_image, detection_result):
     detected_count = len(pose_landmarks_list)
     if detected_count == 0:
         return annotated_image
-    annotate_dividers(annotated_image, detected_count)
+    annotate_dividers(annotated_image, 2)
 
     body_index_to_landmarks: dict[int, List] = dict()
-    divider_size = 1.0 / detected_count
+    divider_size = 1.0 / 3
     for idx in range(detected_count):
         pose_landmarks = pose_landmarks_list[idx]
         body_index = int(pose_landmarks[PoseLandmark.NOSE].x / divider_size)
@@ -49,11 +49,11 @@ def draw_landmarks_on_image(rgb_image, detection_result):
         annotate_body(annotated_image, body)
 
         # center of the divider
-        pose_print_location = (int((body_index + 0.5) * frame_width / detected_count) - 100, 50)
+        pose_print_location = (int((body_index + 0.5) * frame_width / 3) - 100, 50)
 
-        detected_poses = detect_pose(body)
-        for i, pose in enumerate(detected_poses):
-            cv2.putText(annotated_image, f"{pose}", pose_print_location, cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
+        detected_pose = detect_pose(body)
+        if detected_pose is not None:
+            cv2.putText(annotated_image, f"{detected_pose}", pose_print_location, cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 0, 0), 2)
 
     return annotated_image
 
@@ -138,8 +138,8 @@ def annotate_body_old(annotated_image, pose_landmarks, body):
 
 def annotate_dividers(annotated_image, count):
     # Draw vertical dividers
-    for i in range(1, count):
-        x = int(i * frame_width / count)
+    for i in range(1, count+1):
+        x = int(i * frame_width / (count+1))
         cv2.line(annotated_image, (x, 0), (x, frame_height), (200, 200, 200), 10)
 
 
@@ -334,7 +334,8 @@ def test_fps():
 
 if __name__ == "__main__":
     run_live_stream()
-    # run_image("poses/07_shark.png")
+    # run_on_video("/home/yuval/yoga_with_noam.webm")
+    # run_image("poses/01_tree.png")
 
 
 
