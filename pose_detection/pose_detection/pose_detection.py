@@ -25,6 +25,9 @@ def is_warrior2(body: Body) -> bool:
     """
     Check if the body parts correspond to Warrior II pose.
     """
+    # Check that the hands are straight
+    left_hand_straight = is_angle(body.left_elbow_angle(), 180, 40)
+    right_hand_straight = is_angle(body.right_elbow_angle(), 180, 40)
 
     # Check that the arms are 90 degrees from the torso
     left_arm_perpendicular = is_angle(body.left_shoulder_angle(), 90, 15)
@@ -34,11 +37,11 @@ def is_warrior2(body: Body) -> bool:
     right_leg_angle = body.right_knee_angle()
     left_leg_angle = body.left_knee_angle()
     one_bent = exactly_one(is_angle(right_leg_angle, 105, 15), is_angle(left_leg_angle, 105, 15))
-    one_straight = exactly_one(body.is_left_leg_straight(), body.is_right_leg_straight())
+    one_straight = exactly_one(is_angle(right_leg_angle, 180, 15), is_angle(left_leg_angle, 180, 15))
 
     return (
-            body.is_right_hand_straight()
-            and body.is_left_hand_straight()
+            left_hand_straight
+            and right_hand_straight
             and left_arm_perpendicular
             and right_arm_perpendicular
             and one_bent
@@ -59,8 +62,8 @@ def is_tree(body: Body) -> bool:
         is_angle(body.right_hip_angle(),125,30),
     )
     one_leg_straight = exactly_one(
-        body.is_left_leg_straight(),
-        body.is_right_leg_straight()
+        is_angle(body.left_knee_angle(),180,30),
+        is_angle(body.right_knee_angle(),180,30)
     ) and exactly_one(
         is_angle(body.left_hip_angle(),180,30),
         is_angle(body.right_hip_angle(),180,30)
@@ -202,7 +205,7 @@ def is_shark(body: Body) -> bool:
     right_shoulder_angle_ok = is_angle(body.right_shoulder_angle(),170,30)
     left_hip_angle_ok = is_angle(body.left_hip_angle(),190,30)
     right_hip_angle_ok = is_angle(body.right_hip_angle(),170,30)
-    shoulders_height_close_to_knees = abs(body.shoulders_center().y / body.knees_center().y) < 1.2
+    shoulders_height_close_to_knees = abs(body.knees_center().y / body.shoulders_center().y) < 1.2
 
     if left_arm_straight and right_arm_straight and left_knee_angle_ok and right_knee_angle_ok and left_shoulder_angle_ok and right_shoulder_angle_ok and left_hip_angle_ok and right_hip_angle_ok and shoulders_height_close_to_knees:
         return True
@@ -216,7 +219,7 @@ def is_shark(body: Body) -> bool:
     right_shoulder_angle_ok2 = is_angle(body.right_shoulder_angle(),200,50)
     left_hip_angle_ok2 = is_angle(body.left_hip_angle(),170,30)
     right_hip_angle_ok2 = is_angle(body.right_hip_angle(),190,30)
-    shoulders_height_close_to_knees2 = abs(body.shoulders_center().y / body.knees_center().y) < 1.2
+    shoulders_height_close_to_knees2 = abs(body.knees_center().y / body.shoulders_center().y) < 1.2
 
     return left_arm_straight2 and right_arm_straight2 and left_knee_angle_ok2 and right_knee_angle_ok2 and left_shoulder_angle_ok2 and right_shoulder_angle_ok2 and left_hip_angle_ok2 and right_hip_angle_ok2 and shoulders_height_close_to_knees2
 

@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, List
 import cv2
 import mediapipe as mp
 from mediapipe import solutions
@@ -10,6 +10,7 @@ import numpy as np
 
 from body.body import Body
 from body.body_parts import *
+from pose_detection.pose_detection import detect_pose
 
 LAPTOP = True
 FPS = 60
@@ -17,28 +18,46 @@ TIMESTAMP_STEP = int(1000 / FPS)
 timestamp = 0
 frame_width, frame_height = 1280, 720
 # frame_width, frame_height = 1920, 1080
-body = Body(frame_width, frame_height, avg_count=6)
+bodies: dict[int, Body] = dict()
 
 # Global variable to hold last annotated frame
 annotated_frame: Optional[np.ndarray[Any, np.dtype[Any]]] = None
 
+
 def draw_landmarks_on_image(rgb_image, detection_result):
+    global bodies
     pose_landmarks_list = detection_result.pose_landmarks
     annotated_image = np.copy(rgb_image)
+    detected_count = len(pose_landmarks_list)
+    if detected_count == 0:
+        return annotated_image
+    annotate_dividers(annotated_image, detected_count)
 
-    for idx in range(len(pose_landmarks_list)):
+    body_index_to_landmarks: dict[int, List] = dict()
+    divider_size = 1.0 / detected_count
+    for idx in range(detected_count):
         pose_landmarks = pose_landmarks_list[idx]
+        body_index = int(pose_landmarks[PoseLandmark.NOSE].x / divider_size)
+        if body_index not in body_index_to_landmarks.keys():
+            body_index_to_landmarks[body_index] = pose_landmarks
 
+    for body_index, pose_landmarks in body_index_to_landmarks.items():
+        if body_index not in bodies.keys():
+            bodies[body_index] = Body(frame_width, frame_height, avg_count=6)
+        body = bodies[body_index]
         body.update(pose_landmarks)
-        annotate_body(annotated_image)
+        annotate_body(annotated_image, body)
 
-        # detected_poses = detect_pose(body)
-        # for i, pose in enumerate(detected_poses):
-        #     cv2.putText(annotated_image, f"{pose}", (50, 50 + 30 * i), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
+        # center of the divider
+        pose_print_location = (int((body_index + 0.5) * frame_width / detected_count) - 100, 50)
+
+        detected_poses = detect_pose(body)
+        for i, pose in enumerate(detected_poses):
+            cv2.putText(annotated_image, f"{pose}", pose_print_location, cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
 
     return annotated_image
 
-def annotate_body(annotated_image):
+def annotate_body(annotated_image,body):
     # =============================== #
     # new version with body smoothing #
     # ================================#
@@ -86,7 +105,7 @@ def annotate_body(annotated_image):
     cv2.putText(annotated_image, f"{int(body.left_hip_angle())}", (left_hip.x + 10, left_hip.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
     cv2.putText(annotated_image, f"{int(body.right_hip_angle())}", (right_hip.x - 45, right_hip.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
-def annotate_body_old(annotated_image, pose_landmarks):
+def annotate_body_old(annotated_image, pose_landmarks, body):
     # ================================ #
     # old version with pose_landmarks  #
     # ================================ #
@@ -116,6 +135,12 @@ def annotate_body_old(annotated_image, pose_landmarks):
     cv2.putText(annotated_image, f"{int(body.left_hip_angle())}", (int(pose_landmarks[PoseLandmark.LEFT_HIP].x * frame_width), int(pose_landmarks[PoseLandmark.LEFT_HIP].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
     cv2.putText(annotated_image, f"{int(body.right_hip_angle())}", (int(pose_landmarks[PoseLandmark.RIGHT_HIP].x * frame_width), int(pose_landmarks[PoseLandmark.RIGHT_HIP].y * frame_height)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
+
+def annotate_dividers(annotated_image, count):
+    # Draw vertical dividers
+    for i in range(1, count):
+        x = int(i * frame_width / count)
+        cv2.line(annotated_image, (x, 0), (x, frame_height), (200, 200, 200), 10)
 
 
 # Callback for live stream results
