@@ -103,6 +103,9 @@ tree_pose_right_knee_bent_relaxed = PoseTest(
 # =================================== Downward Dog ========================================== |
 # =========================================================================================== |
 
+hips_above_shoulders_rule = GenericPoseRule(lambda b: b.hips_center().y < b.shoulders_center().y)
+shoulders_above_face_rule = GenericPoseRule(lambda b: b.shoulders_center().y < b.face_center().y)
+
 downward_dog_pose_left = PoseTest(
     left_shoulder_angle_rule=RangePoseRule(10, 50, 50),
     right_shoulder_angle_rule=RangePoseRule(340, 50, 50),
@@ -112,8 +115,8 @@ downward_dog_pose_left = PoseTest(
     right_hip_angle_rule=RangePoseRule(270, 50, 50),
     left_knee_angle_rule=RangePoseRule(200, 30, 30),
     right_knee_angle_rule=RangePoseRule(160, 30, 30),
-    hips_above_shoulders=GenericPoseRule(lambda b: b.hips_center().y < b.shoulders_center().y),
-    shoulders_above_face=GenericPoseRule(lambda b: b.shoulders_center().y < b.face_center().y)
+    hips_above_shoulders=hips_above_shoulders_rule,
+    shoulders_above_face=shoulders_above_face_rule
 )
 
 downward_dog_pose_right = PoseTest(
@@ -125,8 +128,8 @@ downward_dog_pose_right = PoseTest(
     right_hip_angle_rule=RangePoseRule(90, 50, 50),
     left_knee_angle_rule=RangePoseRule(160, 30, 30),
     right_knee_angle_rule=RangePoseRule(200, 30, 30),
-    hips_above_shoulders=GenericPoseRule(lambda b: b.hips_center().y < b.shoulders_center().y),
-    shoulders_above_face=GenericPoseRule(lambda b: b.shoulders_center().y < b.face_center().y)
+    hips_above_shoulders=hips_above_shoulders_rule,
+    shoulders_above_face=shoulders_above_face_rule
 )
 
 # TODO: tune these relaxed versions of Downward Dog
@@ -140,8 +143,8 @@ downward_dog_pose_left_relaxed = PoseTest(
     right_hip_angle_rule=RangePoseRule(270, 50, 50),
     left_knee_angle_rule=RangePoseRule(200, 30, 30),
     right_knee_angle_rule=RangePoseRule(160, 30, 30),
-    hips_above_shoulders=GenericPoseRule(lambda b: b.hips_center().y < b.shoulders_center().y),
-    shoulders_above_face=GenericPoseRule(lambda b: b.shoulders_center().y < b.face_center().y)
+    hips_above_shoulders=hips_above_shoulders_rule,
+    shoulders_above_face=shoulders_above_face_rule
 )
 
 downward_dog_pose_right_relaxed = PoseTest(
@@ -153,6 +156,202 @@ downward_dog_pose_right_relaxed = PoseTest(
     right_hip_angle_rule=RangePoseRule(90, 50, 50),
     left_knee_angle_rule=RangePoseRule(160, 30, 30),
     right_knee_angle_rule=RangePoseRule(200, 30, 30),
-    hips_above_shoulders=GenericPoseRule(lambda b: b.hips_center().y < b.shoulders_center().y),
-    shoulders_above_face=GenericPoseRule(lambda b: b.shoulders_center().y < b.face_center().y)
+    hips_above_shoulders=hips_above_shoulders_rule,
+    shoulders_above_face=shoulders_above_face_rule
+)
+
+# =========================================================================================== |
+# ====================================== Snake ============================================== |
+# =========================================================================================== |
+
+hips_below_shoulders_rule = GenericPoseRule(lambda b: b.hips_center().y > b.shoulders_center().y)
+palms_below_hips_rule = GenericPoseRule(lambda b: b.left_palm().y > b.hips_center().y and b.right_palm().y > b.hips_center().y)
+
+snake_pose_left = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(150, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(210, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(170, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(170, 40, 40),
+    left_hip_angle_rule=RangePoseRule(200, 50, 50),
+    right_hip_angle_rule=RangePoseRule(140, 50, 50),
+    left_knee_angle_rule=RangePoseRule(160, 30, 30),
+    right_knee_angle_rule=RangePoseRule(200, 30, 30),
+    hips_below_shoulders=hips_below_shoulders_rule,
+    palms_below_hips=palms_below_hips_rule
+)
+
+snake_pose_right = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(210, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(150, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(170, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(170, 40, 40),
+    left_hip_angle_rule=RangePoseRule(140, 50, 50),
+    right_hip_angle_rule=RangePoseRule(200, 50, 50),
+    left_knee_angle_rule=RangePoseRule(200, 30, 30),
+    right_knee_angle_rule=RangePoseRule(160, 30, 30),
+    hips_below_shoulders=hips_below_shoulders_rule,
+    palms_below_hips=palms_below_hips_rule
+)
+
+snake_pose_left_relaxed = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(150, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(210, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(170, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(170, 40, 40),
+    left_hip_angle_rule=RangePoseRule(200, 50, 50),
+    right_hip_angle_rule=RangePoseRule(140, 50, 50),
+    left_knee_angle_rule=RangePoseRule(160, 30, 30),
+    right_knee_angle_rule=RangePoseRule(200, 30, 30),
+    hips_below_shoulders=hips_below_shoulders_rule,
+    palms_below_hips=palms_below_hips_rule
+)
+
+snake_pose_right_relaxed = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(210, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(150, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(170, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(170, 40, 40),
+    left_hip_angle_rule=RangePoseRule(140, 50, 50),
+    right_hip_angle_rule=RangePoseRule(200, 50, 50),
+    left_knee_angle_rule=RangePoseRule(200, 30, 30),
+    right_knee_angle_rule=RangePoseRule(160, 30, 30),
+    hips_below_shoulders=hips_below_shoulders_rule,
+    palms_below_hips=palms_below_hips_rule
+)
+
+# =========================================================================================== |
+# ====================================== Cat ================================================ |
+# =========================================================================================== |
+
+head_below_shoulders_rule = GenericPoseRule(lambda b: b.face_center().y > b.shoulders_center().y)
+
+cat_pose_left = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(270, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(90, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    left_hip_angle_rule=RangePoseRule(260, 50, 50),
+    right_hip_angle_rule=RangePoseRule(100, 50, 50),
+    left_knee_angle_rule=RangePoseRule(260, 30, 30),
+    right_knee_angle_rule=RangePoseRule(90, 30, 30),
+    head_below_shoulders=head_below_shoulders_rule
+)
+
+cat_pose_right = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(90, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(270, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    left_hip_angle_rule=RangePoseRule(100, 50, 50),
+    right_hip_angle_rule=RangePoseRule(260, 50, 50),
+    left_knee_angle_rule=RangePoseRule(90, 30, 30),
+    right_knee_angle_rule=RangePoseRule(260, 30, 30),
+    head_below_shoulders=head_below_shoulders_rule
+)
+
+cat_pose_left_relaxed = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(270, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(90, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    left_hip_angle_rule=RangePoseRule(260, 50, 50),
+    right_hip_angle_rule=RangePoseRule(100, 50, 50),
+    left_knee_angle_rule=RangePoseRule(260, 30, 30),
+    right_knee_angle_rule=RangePoseRule(90, 30, 30),
+    head_below_shoulders=head_below_shoulders_rule
+)
+
+cat_pose_right_relaxed = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(90, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(270, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    left_hip_angle_rule=RangePoseRule(100, 50, 50),
+    right_hip_angle_rule=RangePoseRule(260, 50, 50),
+    left_knee_angle_rule=RangePoseRule(90, 30, 30),
+    right_knee_angle_rule=RangePoseRule(260, 30, 30),
+    head_below_shoulders=head_below_shoulders_rule
+)
+
+# =========================================================================================== |
+# ====================================== Frog =============================================== |
+# =========================================================================================== |
+
+hips_below_shoulders_rule = GenericPoseRule(lambda b: b.hips_center().y > b.shoulders_center().y)
+palms_below_hips_rule = GenericPoseRule(lambda b: b.left_palm().y > b.hips_center().y and b.right_palm().y > b.hips_center().y)
+
+frog_pose = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(160, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(160, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    left_hip_angle_rule=RangePoseRule(70, 30, 30),
+    right_hip_angle_rule=RangePoseRule(70, 30, 30),
+    left_knee_angle_rule=RangePoseRule(70, 30, 30),
+    right_knee_angle_rule=RangePoseRule(70, 30, 30),
+    hips_below_shoulders=hips_below_shoulders_rule,
+    palms_below_hips=palms_below_hips_rule
+)
+
+frog_pose_relaxed = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(160, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(160, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    left_hip_angle_rule=RangePoseRule(70, 30, 30),
+    right_hip_angle_rule=RangePoseRule(70, 30, 30),
+    left_knee_angle_rule=RangePoseRule(70, 30, 30),
+    right_knee_angle_rule=RangePoseRule(70, 30, 30),
+    hips_below_shoulders=hips_below_shoulders_rule,
+    palms_below_hips=palms_below_hips_rule
+)
+
+# =========================================================================================== |
+# ====================================== Shark ============================================== |
+# =========================================================================================== |
+
+hips_below_shoulders_rule = GenericPoseRule(lambda b: b.hips_center().y > b.shoulders_center().y)
+shark_pose_left = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(200, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(160, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    left_hip_angle_rule=RangePoseRule(200, 50, 50),
+    right_hip_angle_rule=RangePoseRule(140, 50, 50),
+    left_knee_angle_rule=RangePoseRule(160, 30, 30),
+    right_knee_angle_rule=RangePoseRule(200, 30, 30),
+
+)
+
+shark_pose_right = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(160, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(200, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    left_hip_angle_rule=RangePoseRule(140, 50, 50),
+    right_hip_angle_rule=RangePoseRule(200, 50, 50),
+    left_knee_angle_rule=RangePoseRule(200, 30, 30),
+    right_knee_angle_rule=RangePoseRule(160, 30, 30),
+)
+
+shark_pose_left_relaxed = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(200, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(160, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    left_hip_angle_rule=RangePoseRule(200, 50, 50),
+    right_hip_angle_rule=RangePoseRule(140, 50, 50),
+    left_knee_angle_rule=RangePoseRule(160, 30, 30),
+    right_knee_angle_rule=RangePoseRule(200, 30, 30),
+)
+
+shark_pose_right_relaxed = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(160, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(200, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(180, 40, 40),
+    left_hip_angle_rule=RangePoseRule(140, 50, 50),
+    right_hip_angle_rule=RangePoseRule(200, 50, 50),
+    left_knee_angle_rule=RangePoseRule(200, 30, 30),
+    right_knee_angle_rule=RangePoseRule(160, 30, 30),
 )
