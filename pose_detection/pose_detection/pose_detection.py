@@ -90,10 +90,20 @@ def is_eagle(body: Body) -> bool:
     """
     Check if the body parts correspond to Eagle pose.
     """
-    # if body.active_pose == "Eagle":
-    #     return exactly_one(eagle_pose_left_relaxed.is_satisfied(body), eagle_pose_right_relaxed.is_satisfied(body))
+    if body.active_pose == "Eagle":
+        return exactly_one(
+            eagle_pose_right_leg_crossed_right_arm_under_relaxed.is_satisfied(body),
+            eagle_pose_left_leg_crossed_left_arm_under_relaxed.is_satisfied(body),
+            eagle_pose_right_leg_crossed_left_arm_under_relaxed.is_satisfied(body),
+            eagle_pose_left_leg_crossed_right_arm_under_relaxed.is_satisfied(body)
+        )
 
-    return exactly_one(eagle_pose_left_leg_crossed_right_arm_under.is_satisfied(body))
+    return exactly_one(
+        eagle_pose_right_leg_crossed_right_arm_under.is_satisfied(body),
+        eagle_pose_left_leg_crossed_left_arm_under.is_satisfied(body),
+        eagle_pose_right_leg_crossed_left_arm_under.is_satisfied(body),
+        eagle_pose_left_leg_crossed_right_arm_under.is_satisfied(body)
+    )
 #
 # def is_crocodile(body: Body) -> bool:
 #     """
