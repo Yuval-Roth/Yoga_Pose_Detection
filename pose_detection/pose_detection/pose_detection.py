@@ -132,14 +132,14 @@ def is_eagle(body: Body) -> bool:
 #
 #     return butterfly_pose.is_satisfied(body)
 #
-# def is_crow(body: Body) -> bool:
-#     """
-#     Check if the body parts correspond to Crow pose.
-#     """
-#     if body.active_pose == "Crow":
-#         return crow_pose_relaxed.is_satisfied(body)
-#
-#     return crow_pose.is_satisfied(body)
+def is_crow(body: Body) -> bool:
+    """
+    Check if the body parts correspond to Crow pose.
+    """
+    if body.active_pose == "Crow":
+        return exactly_one(crow_pose_left_relaxed.is_satisfied(body), crow_pose_right_relaxed.is_satisfied(body))
+
+    return exactly_one(crow_pose_left.is_satisfied(body), crow_pose_right.is_satisfied(body))
 
 
 def detect_pose(body: Body) -> str | None:
@@ -186,9 +186,9 @@ def detect_pose(body: Body) -> str | None:
     # if is_butterfly(body):
     #     body.active_pose = "Butterfly"
     #     return "Butterfly"
-    # if is_crow(body):
-    #     body.active_pose = "Crow"
-    #     return "Crow"
+    if is_crow(body):
+        body.active_pose = "Crow"
+        return "Crow"
 
     body.active_pose = None
     return None

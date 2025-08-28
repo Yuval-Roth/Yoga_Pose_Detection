@@ -20,7 +20,7 @@ frame_width, frame_height = 1280, 720
 # frame_width, frame_height = 1920, 1080
 bodies: dict[int, Body] = dict()
 avg_count = 6
-only_skeletons = True
+only_skeletons = False
 
 # Global variable to hold last annotated frame
 annotated_frame: Optional[np.ndarray[Any, np.dtype[Any]]] = None
@@ -380,8 +380,8 @@ def test_video():
 
 if __name__ == "__main__":
     # run_live_stream()
-    run_on_video("/home/yuval/3_kids.webm")
-    # run_image("poses/09_eagle.png")
+    # run_on_video("/home/yuval/3_kids.webm")
+    run_image("poses/08_crow.png")
     # test_video()
 
 
