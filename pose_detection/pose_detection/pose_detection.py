@@ -77,6 +77,60 @@ def is_shark(body: Body) -> bool:
 
     return exactly_one(shark_pose_left.is_satisfied(body), shark_pose_right.is_satisfied(body))
 
+def is_monkey(body: Body) -> bool:
+    """
+    Check if the body parts correspond to Monkey pose.
+    """
+    if body.active_pose == "Monkey":
+        return exactly_one(monkey_pose_left_relaxed.is_satisfied(body), monkey_pose_right_relaxed.is_satisfied(body))
+
+    return exactly_one(monkey_pose_left.is_satisfied(body), monkey_pose_right.is_satisfied(body))
+
+# def is_eagle(body: Body) -> bool:
+#     """
+#     Check if the body parts correspond to Eagle pose.
+#     """
+#     if body.active_pose == "Eagle":
+#         return exactly_one(eagle_pose_left_relaxed.is_satisfied(body), eagle_pose_right_relaxed.is_satisfied(body))
+#
+#     return exactly_one(eagle_pose_left.is_satisfied(body), eagle_pose_right.is_satisfied(body))
+#
+# def is_crocodile(body: Body) -> bool:
+#     """
+#     Check if the body parts correspond to Crocodile pose.
+#     """
+#     if body.active_pose == "Crocodile":
+#         return crocodile_pose_relaxed.is_satisfied(body)
+#
+#     return crocodile_pose.is_satisfied(body)
+#
+# def is_lotus(body: Body) -> bool:
+#     """
+#     Check if the body parts correspond to Lotus pose.
+#     """
+#     if body.active_pose == "Lotus":
+#         return exactly_one(lotus_pose_left_relaxed.is_satisfied(body), lotus_pose_right_relaxed.is_satisfied(body))
+#
+#     return exactly_one(lotus_pose_left.is_satisfied(body), lotus_pose_right.is_satisfied(body))
+#
+# def is_butterfly(body: Body) -> bool:
+#     """
+#     Check if the body parts correspond to Butterfly pose.
+#     """
+#     if body.active_pose == "Butterfly":
+#         return butterfly_pose_relaxed.is_satisfied(body)
+#
+#     return butterfly_pose.is_satisfied(body)
+#
+# def is_crow(body: Body) -> bool:
+#     """
+#     Check if the body parts correspond to Crow pose.
+#     """
+#     if body.active_pose == "Crow":
+#         return crow_pose_relaxed.is_satisfied(body)
+#
+#     return crow_pose.is_satisfied(body)
+
 
 def detect_pose(body: Body) -> str | None:
     """
@@ -107,6 +161,24 @@ def detect_pose(body: Body) -> str | None:
     if is_shark(body):
         body.active_pose = "Shark"
         return "Shark"
+    if is_monkey(body):
+        body.active_pose = "Monkey"
+        return "Monkey"
+    # if is_eagle(body):
+    #     body.active_pose = "Eagle"
+    #     return "Eagle"
+    # if is_crocodile(body):
+    #     body.active_pose = "Crocodile"
+    #     return "Crocodile"
+    # if is_lotus(body):
+    #     body.active_pose = "Lotus"
+    #     return "Lotus"
+    # if is_butterfly(body):
+    #     body.active_pose = "Butterfly"
+    #     return "Butterfly"
+    # if is_crow(body):
+    #     body.active_pose = "Crow"
+    #     return "Crow"
 
     body.active_pose = None
     return None

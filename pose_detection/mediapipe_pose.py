@@ -19,6 +19,7 @@ timestamp = 0
 frame_width, frame_height = 1280, 720
 # frame_width, frame_height = 1920, 1080
 bodies: dict[int, Body] = dict()
+avg_count = 6
 
 # Global variable to hold last annotated frame
 annotated_frame: Optional[np.ndarray[Any, np.dtype[Any]]] = None
@@ -28,6 +29,7 @@ def draw_landmarks_on_image(rgb_image, detection_result):
     global bodies
     pose_landmarks_list = detection_result.pose_landmarks
     annotated_image = np.copy(rgb_image)
+    frame_height, frame_width, _ = annotated_image.shape
     detected_count = len(pose_landmarks_list)
     if detected_count == 0:
         return annotated_image
@@ -43,7 +45,7 @@ def draw_landmarks_on_image(rgb_image, detection_result):
 
     for body_index, pose_landmarks in body_index_to_landmarks.items():
         if body_index not in bodies.keys():
-            bodies[body_index] = Body(frame_width, frame_height, avg_count=6)
+            bodies[body_index] = Body(frame_width, frame_height, avg_count=avg_count)
         body = bodies[body_index]
         body.update(pose_landmarks)
         annotate_body(annotated_image, body)
@@ -137,6 +139,7 @@ def annotate_body_old(annotated_image, pose_landmarks, body):
 
 
 def annotate_dividers(annotated_image, count):
+    frame_height, frame_width, _ = annotated_image.shape
     # Draw vertical dividers
     for i in range(1, count+1):
         x = int(i * frame_width / (count+1))
@@ -245,6 +248,8 @@ def run_live_stream():
     cv2.destroyAllWindows()
 
 def run_image(image_path: str):
+    global avg_count
+    avg_count = 1
     base_options = python.BaseOptions(model_asset_path="model/pose_landmarker_heavy.task")
     options = vision.PoseLandmarkerOptions(
         base_options=base_options,
@@ -333,9 +338,9 @@ def test_fps():
 
 
 if __name__ == "__main__":
-    run_live_stream()
+    # run_live_stream()
     # run_on_video("/home/yuval/yoga_with_noam.webm")
-    # run_image("poses/01_tree.png")
+    run_image("poses/05_monkey2.png")
 
 
 
