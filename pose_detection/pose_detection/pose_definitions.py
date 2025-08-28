@@ -53,6 +53,8 @@ warrior_pose_right_knee_bent_relaxed = PoseTest(
 # ====================================== Tree =============================================== |
 # =========================================================================================== |
 
+left_palm_above_head_rule = GenericPoseRule(lambda b: b.left_palm().y < b.face_center().y)
+right_palm_above_head_rule = GenericPoseRule(lambda b: b.right_palm().y < b.face_center().y)
 tree_pose_left_knee_bent = PoseTest(
     left_shoulder_angle_rule=RangePoseRule(15, 30, 30),
     right_shoulder_angle_rule=RangePoseRule(15, 30, 30),
@@ -62,6 +64,8 @@ tree_pose_left_knee_bent = PoseTest(
     right_hip_angle_rule=RangePoseRule(180, 30, 30),
     left_knee_angle_rule=RangePoseRule(50, 50, 50),
     right_knee_angle_rule=RangePoseRule(180, 30, 30),
+    left_palm_above_head=left_palm_above_head_rule,
+    right_palm_above_head=right_palm_above_head_rule
 )
 
 tree_pose_right_knee_bent = PoseTest(
@@ -73,6 +77,8 @@ tree_pose_right_knee_bent = PoseTest(
     right_hip_angle_rule=RangePoseRule(125, 30, 30),
     left_knee_angle_rule=RangePoseRule(180, 30, 30),
     right_knee_angle_rule=RangePoseRule(50, 50, 50),
+    left_palm_above_head=left_palm_above_head_rule,
+    right_palm_above_head=right_palm_above_head_rule
 )
 
 # TODO: tune these relaxed versions of Tree
@@ -86,6 +92,8 @@ tree_pose_left_knee_bent_relaxed = PoseTest(
     right_hip_angle_rule=RangePoseRule(180, 30, 30),
     left_knee_angle_rule=RangePoseRule(50, 50, 50),
     right_knee_angle_rule=RangePoseRule(180, 30, 30),
+    left_palm_above_head=left_palm_above_head_rule,
+    right_palm_above_head=right_palm_above_head_rule
 )
 
 tree_pose_right_knee_bent_relaxed = PoseTest(
@@ -97,6 +105,8 @@ tree_pose_right_knee_bent_relaxed = PoseTest(
     right_hip_angle_rule=RangePoseRule(125, 30, 30),
     left_knee_angle_rule=RangePoseRule(180, 30, 30),
     right_knee_angle_rule=RangePoseRule(50, 50, 50),
+    left_palm_above_head=left_palm_above_head_rule,
+    right_palm_above_head=right_palm_above_head_rule
 )
 
 # =========================================================================================== |
@@ -193,6 +203,8 @@ snake_pose_right = PoseTest(
     palms_below_hips=palms_below_hips_rule
 )
 
+# TODO: tune these relaxed versions of Snake
+
 snake_pose_left_relaxed = PoseTest(
     left_shoulder_angle_rule=RangePoseRule(150, 30, 30),
     right_shoulder_angle_rule=RangePoseRule(210, 30, 30),
@@ -249,6 +261,9 @@ cat_pose_right = PoseTest(
     head_below_shoulders=head_below_shoulders_rule
 )
 
+# TODO: tune these relaxed versions of Cat
+
+
 cat_pose_left_relaxed = PoseTest(
     left_shoulder_angle_rule=RangePoseRule(270, 30, 30),
     right_shoulder_angle_rule=RangePoseRule(90, 30, 30),
@@ -293,6 +308,8 @@ frog_pose = PoseTest(
     palms_below_hips=palms_below_hips_rule
 )
 
+# TODO: tune these relaxed versions of Frog
+
 frog_pose_relaxed = PoseTest(
     left_shoulder_angle_rule=RangePoseRule(160, 30, 30),
     right_shoulder_angle_rule=RangePoseRule(160, 30, 30),
@@ -310,7 +327,7 @@ frog_pose_relaxed = PoseTest(
 # ====================================== Shark ============================================== |
 # =========================================================================================== |
 
-hips_below_shoulders_rule = GenericPoseRule(lambda b: b.hips_center().y > b.shoulders_center().y)
+shoulders_height_close_to_knees_rule = GenericPoseRule(lambda b: abs(b.knees_center().y / b.shoulders_center().y) < 1.2)
 shark_pose_left = PoseTest(
     left_shoulder_angle_rule=RangePoseRule(200, 30, 30),
     right_shoulder_angle_rule=RangePoseRule(160, 30, 30),
@@ -320,7 +337,7 @@ shark_pose_left = PoseTest(
     right_hip_angle_rule=RangePoseRule(140, 50, 50),
     left_knee_angle_rule=RangePoseRule(160, 30, 30),
     right_knee_angle_rule=RangePoseRule(200, 30, 30),
-
+    shoulders_height_close_to_knees = shoulders_height_close_to_knees_rule
 )
 
 shark_pose_right = PoseTest(
@@ -332,7 +349,10 @@ shark_pose_right = PoseTest(
     right_hip_angle_rule=RangePoseRule(200, 50, 50),
     left_knee_angle_rule=RangePoseRule(200, 30, 30),
     right_knee_angle_rule=RangePoseRule(160, 30, 30),
+    shoulders_height_close_to_knees = shoulders_height_close_to_knees_rule
 )
+
+# TODO: tune these relaxed versions of Shark
 
 shark_pose_left_relaxed = PoseTest(
     left_shoulder_angle_rule=RangePoseRule(200, 30, 30),
@@ -343,6 +363,7 @@ shark_pose_left_relaxed = PoseTest(
     right_hip_angle_rule=RangePoseRule(140, 50, 50),
     left_knee_angle_rule=RangePoseRule(160, 30, 30),
     right_knee_angle_rule=RangePoseRule(200, 30, 30),
+    shoulders_height_close_to_knees = shoulders_height_close_to_knees_rule
 )
 
 shark_pose_right_relaxed = PoseTest(
@@ -354,4 +375,5 @@ shark_pose_right_relaxed = PoseTest(
     right_hip_angle_rule=RangePoseRule(200, 50, 50),
     left_knee_angle_rule=RangePoseRule(200, 30, 30),
     right_knee_angle_rule=RangePoseRule(160, 30, 30),
+    shoulders_height_close_to_knees = shoulders_height_close_to_knees_rule
 )
