@@ -1,6 +1,6 @@
 from enum import Enum
 
-from body.math_utils import Vec2, Vec2Avg, Vec2Pair
+from math_utils import Vec2Avg, Vec2Pair
 
 
 class BodyParts(Enum):

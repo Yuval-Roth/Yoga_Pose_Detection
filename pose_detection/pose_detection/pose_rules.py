@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Callable, override
 
 from body.body import Body
-from body.math_utils import signed_angle_diff
+from math_utils import signed_angle_diff
 
 
 class PoseRule(ABC):

@@ -1,4 +1,4 @@
-from body.math_utils import relatively_close
+from math_utils import relatively_close
 from pose_detection.pose_rules import RangePoseRule, AcceptAllPoseRule, GenericPoseRule
 from pose_detection.pose_test import PoseTest
 
@@ -707,6 +707,8 @@ butterfly_pose = PoseTest(
     right_knee_angle_rule=RangePoseRule(15, 20, 20),
     palms_close_to_ankles_rule=palms_close_to_ankles_rule
 )
+
+# TODO: tune these relaxed versions of Butterfly
 
 butterfly_pose_relaxed = PoseTest(
     left_shoulder_angle_rule=RangePoseRule(170, 30, 30),
