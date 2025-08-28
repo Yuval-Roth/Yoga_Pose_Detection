@@ -20,6 +20,7 @@ frame_width, frame_height = 1280, 720
 # frame_width, frame_height = 1920, 1080
 bodies: dict[int, Body] = dict()
 avg_count = 6
+only_skeletons = False
 
 # Global variable to hold last annotated frame
 annotated_frame: Optional[np.ndarray[Any, np.dtype[Any]]] = None
@@ -28,7 +29,10 @@ annotated_frame: Optional[np.ndarray[Any, np.dtype[Any]]] = None
 def draw_landmarks_on_image(rgb_image, detection_result):
     global bodies
     pose_landmarks_list = detection_result.pose_landmarks
-    annotated_image = np.copy(rgb_image)
+    if only_skeletons:
+        annotated_image = np.zeros_like(rgb_image, dtype=np.uint8) * 255
+    else:
+        annotated_image = np.copy(rgb_image)
     frame_height, frame_width, _ = annotated_image.shape
     detected_count = len(pose_landmarks_list)
     if detected_count == 0:
@@ -311,7 +315,7 @@ def run_on_video(video_path: str):
             annotated = annotated_frame
             cv2.imshow("Pose on Video", cv2.cvtColor(annotated, cv2.COLOR_RGB2BGR))
 
-        if cv2.waitKey(1) & 0xFF == ord("q"):
+        if cv2.waitKey(15) & 0xFF == ord("q"):
             break
 
     cap.release()
