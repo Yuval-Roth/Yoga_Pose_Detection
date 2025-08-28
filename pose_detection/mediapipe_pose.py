@@ -277,12 +277,16 @@ def run_image(image_path: str):
     cv2.destroyAllWindows()
 
 def run_on_video(video_path: str):
-    base_options = python.BaseOptions(model_asset_path="model/pose_landmarker_heavy.task")
+    base_options = python.BaseOptions(
+        model_asset_path="model/pose_landmarker_heavy.task",
+        delegate=python.BaseOptions.Delegate.GPU
+    )
     options = vision.PoseLandmarkerOptions(
         base_options=base_options,
-        running_mode=vision.RunningMode.VIDEO,
+        running_mode=vision.RunningMode.LIVE_STREAM,
         output_segmentation_masks=False,
-        num_poses=5
+        num_poses=5,
+        result_callback=result_callback
     )
     detector = vision.PoseLandmarker.create_from_options(options)
 
@@ -300,11 +304,12 @@ def run_on_video(video_path: str):
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
 
-        result = detector.detect_for_video(mp_image, timestamp)
+        detector.detect_async(mp_image, timestamp)
         timestamp += timestamp_step
 
-        annotated = draw_landmarks_on_image(rgb_frame, result)
-        cv2.imshow("Pose on Video", cv2.cvtColor(annotated, cv2.COLOR_RGB2BGR))
+        if annotated_frame is not None:
+            annotated = annotated_frame
+            cv2.imshow("Pose on Video", cv2.cvtColor(annotated, cv2.COLOR_RGB2BGR))
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
@@ -336,11 +341,24 @@ def test_fps():
     print("FPS:", frames / (end - start))
     cap.release()
 
+def test_video():
+    cap = cv2.VideoCapture("/home/yuval/yoga_with_noam.webm")
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+        cv2.imshow("Video Test", frame)
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
+    cap.release()
+    cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
     # run_live_stream()
-    # run_on_video("/home/yuval/yoga_with_noam.webm")
-    run_image("poses/05_monkey2.png")
+    run_on_video("/home/yuval/3_kids.webm")
+    # run_image("poses/09_eagle.png")
+    # test_video()
 
 
 
