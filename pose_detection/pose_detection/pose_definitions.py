@@ -434,5 +434,108 @@ monkey_pose_right_relaxed = PoseTest(
     left_palm_below_head=GenericPoseRule(lambda b: b.left_palm().y > b.face_center().y)
 )
 
+# =========================================================================================== |
+# ==================================== Eagle ================================================ |
+# =========================================================================================== |
+
+eagle_pose_left_leg_crossed_right_arm_under = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(230, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(180, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(280, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(315, 40, 40),
+    left_hip_angle_rule=RangePoseRule(200, 20, 20),
+    right_hip_angle_rule=RangePoseRule(180, 20, 20),
+    left_knee_angle_rule=RangePoseRule(170, 30, 30),
+    right_knee_angle_rule=RangePoseRule(180, 30, 30),
+    right_leg_crossed_rule=GenericPoseRule(lambda b: b.right_ankle().x > b.left_ankle().x)
+)
+
+eagle_pose_left_leg_crossed_left_arm_under = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(180, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(230, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(315, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(280, 40, 40),
+    left_hip_angle_rule=RangePoseRule(180, 20, 20),
+    right_hip_angle_rule=RangePoseRule(200, 20, 20),
+    left_knee_angle_rule=RangePoseRule(170, 30, 30),
+    right_knee_angle_rule=RangePoseRule(180, 30, 30),
+    left_leg_crossed_rule=GenericPoseRule(lambda b: b.left_ankle().x > b.right_ankle().x)
+)
+
+eagle_pose_right_leg_crossed_left_arm_under = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(180, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(230, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(315, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(280, 40, 40),
+    left_hip_angle_rule=RangePoseRule(180, 20, 20),
+    right_hip_angle_rule=RangePoseRule(200, 20, 20),
+    left_knee_angle_rule=RangePoseRule(180, 30, 30),
+    right_knee_angle_rule=RangePoseRule(170, 30, 30),
+    left_leg_crossed_rule=GenericPoseRule(lambda b: b.left_ankle().x < b.right_ankle().x)
+)
+
+eagle_pose_right_leg_crossed_right_arm_under = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(230, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(180, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(280, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(315, 40, 40),
+    left_hip_angle_rule=RangePoseRule(180, 20, 20),
+    right_hip_angle_rule=RangePoseRule(200, 20, 20),
+    left_knee_angle_rule=RangePoseRule(180, 30, 30),
+    right_knee_angle_rule=RangePoseRule(170, 30, 30),
+    left_leg_crossed_rule=GenericPoseRule(lambda b: b.left_ankle().x < b.right_ankle().x)
+)
+
+# TODO: tune these relaxed versions of Eagle
+
+eagle_pose_left_leg_crossed_right_arm_under_relaxed = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(230, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(180, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(280, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(315, 40, 40),
+    left_hip_angle_rule=RangePoseRule(200, 20, 20),
+    right_hip_angle_rule=RangePoseRule(180, 20, 20),
+    left_knee_angle_rule=RangePoseRule(170, 30, 30),
+    right_knee_angle_rule=RangePoseRule(180, 30, 30),
+    right_leg_crossed_rule=GenericPoseRule(lambda b: b.right_ankle().x > b.left_ankle().x)
+)
+
+eagle_pose_left_leg_crossed_left_arm_under_relaxed = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(180, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(230, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(315, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(280, 40, 40),
+    left_hip_angle_rule=RangePoseRule(180, 20, 20),
+    right_hip_angle_rule=RangePoseRule(200, 20, 20),
+    left_knee_angle_rule=RangePoseRule(170, 30, 30),
+    right_knee_angle_rule=RangePoseRule(180, 30, 30),
+    left_leg_crossed_rule=GenericPoseRule(lambda b: b.left_ankle().x > b.right_ankle().x)
+)
+
+eagle_pose_right_leg_crossed_left_arm_under_relaxed = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(180, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(230, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(315, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(280, 40, 40),
+    left_hip_angle_rule=RangePoseRule(180, 20, 20),
+    right_hip_angle_rule=RangePoseRule(200, 20, 20),
+    left_knee_angle_rule=RangePoseRule(180, 30, 30),
+    right_knee_angle_rule=RangePoseRule(170, 30, 30),
+    left_leg_crossed_rule=GenericPoseRule(lambda b: b.left_ankle().x < b.right_ankle().x)
+)
+
+eagle_pose_right_leg_crossed_right_arm_under_relaxed = PoseTest(
+    left_shoulder_angle_rule=RangePoseRule(230, 30, 30),
+    right_shoulder_angle_rule=RangePoseRule(180, 30, 30),
+    left_elbow_angle_rule=RangePoseRule(280, 40, 40),
+    right_elbow_angle_rule=RangePoseRule(315, 40, 40),
+    left_hip_angle_rule=RangePoseRule(180, 20, 20),
+    right_hip_angle_rule=RangePoseRule(200, 20, 20),
+    left_knee_angle_rule=RangePoseRule(180, 30, 30),
+    right_knee_angle_rule=RangePoseRule(170, 30, 30),
+    left_leg_crossed_rule=GenericPoseRule(lambda b: b.left_ankle().x < b.right_ankle().x)
+)
+
+
 
 

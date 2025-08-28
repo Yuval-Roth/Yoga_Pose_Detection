@@ -268,6 +268,7 @@ def run_image(image_path: str):
 
     # Load image
     bgr_image = cv2.imread(image_path)
+    bgr_image = cv2.flip(bgr_image,1)
     rgb_image = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB)
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
 
@@ -360,8 +361,8 @@ def test_video():
 
 if __name__ == "__main__":
     # run_live_stream()
-    run_on_video("/home/yuval/3_kids.webm")
-    # run_image("poses/09_eagle.png")
+    # run_on_video("/home/yuval/3_kids.webm")
+    run_image("poses/09_eagle.png")
     # test_video()
 
 

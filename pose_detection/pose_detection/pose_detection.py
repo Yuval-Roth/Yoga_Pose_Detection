@@ -86,14 +86,14 @@ def is_monkey(body: Body) -> bool:
 
     return exactly_one(monkey_pose_left.is_satisfied(body), monkey_pose_right.is_satisfied(body))
 
-# def is_eagle(body: Body) -> bool:
-#     """
-#     Check if the body parts correspond to Eagle pose.
-#     """
-#     if body.active_pose == "Eagle":
-#         return exactly_one(eagle_pose_left_relaxed.is_satisfied(body), eagle_pose_right_relaxed.is_satisfied(body))
-#
-#     return exactly_one(eagle_pose_left.is_satisfied(body), eagle_pose_right.is_satisfied(body))
+def is_eagle(body: Body) -> bool:
+    """
+    Check if the body parts correspond to Eagle pose.
+    """
+    # if body.active_pose == "Eagle":
+    #     return exactly_one(eagle_pose_left_relaxed.is_satisfied(body), eagle_pose_right_relaxed.is_satisfied(body))
+
+    return exactly_one(eagle_pose_left_leg_crossed_right_arm_under.is_satisfied(body))
 #
 # def is_crocodile(body: Body) -> bool:
 #     """
@@ -164,9 +164,9 @@ def detect_pose(body: Body) -> str | None:
     if is_monkey(body):
         body.active_pose = "Monkey"
         return "Monkey"
-    # if is_eagle(body):
-    #     body.active_pose = "Eagle"
-    #     return "Eagle"
+    if is_eagle(body):
+        body.active_pose = "Eagle"
+        return "Eagle"
     # if is_crocodile(body):
     #     body.active_pose = "Crocodile"
     #     return "Crocodile"

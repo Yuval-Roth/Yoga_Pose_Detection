@@ -82,6 +82,11 @@ class Body:
         right_knee = self.parts[BodyParts.RIGHT_LEG].knee
         return left_knee.center_between(right_knee)
 
+    def right_ankle(self):
+        return self.parts[BodyParts.RIGHT_LEG].ankle
+    def left_ankle(self):
+        return self.parts[BodyParts.LEFT_LEG].ankle
+
     def left_shoulder_angle(self):
         return 180 - Vec2.angle(self.parts[BodyParts.LEFT_ARM].first.vector(), self.parts[BodyParts.TORSO].left.vector())
 
