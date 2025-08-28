@@ -381,7 +381,7 @@ def test_video():
 if __name__ == "__main__":
     # run_live_stream()
     # run_on_video("/home/yuval/3_kids.webm")
-    run_image("poses/08_crow.png")
+    run_image("poses/12_butterfly.png")
     # test_video()
 
 

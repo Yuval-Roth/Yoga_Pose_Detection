@@ -119,4 +119,14 @@ def signed_angle_diff(first, second):
         diff -= 360
     return diff
 
+def relatively_close(a, b, factor):
+    """
+    Check if two values are relatively close within a given factor.
+    using division of the larger by the smaller.
+    """
+    if a > b:
+        return a / b <= factor
+    else:
+        return b / a <= factor
+
 

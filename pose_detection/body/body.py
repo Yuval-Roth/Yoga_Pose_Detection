@@ -82,6 +82,16 @@ class Body:
         right_knee = self.parts[BodyParts.RIGHT_LEG].knee
         return left_knee.center_between(right_knee)
 
+    def palms_center(self):
+        left_palm = self.parts[BodyParts.LEFT_ARM].wrist
+        right_palm = self.parts[BodyParts.RIGHT_ARM].wrist
+        return left_palm.center_between(right_palm)
+
+    def ankles_center(self):
+        left_ankle = self.parts[BodyParts.LEFT_LEG].ankle
+        right_ankle = self.parts[BodyParts.RIGHT_LEG].ankle
+        return left_ankle.center_between(right_ankle)
+
     def right_ankle(self):
         return self.parts[BodyParts.RIGHT_LEG].ankle
     def left_ankle(self):
