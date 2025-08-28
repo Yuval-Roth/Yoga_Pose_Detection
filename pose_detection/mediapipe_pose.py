@@ -20,7 +20,7 @@ frame_width, frame_height = 1280, 720
 # frame_width, frame_height = 1920, 1080
 bodies: dict[int, Body] = dict()
 avg_count = 6
-only_skeletons = False
+only_skeletons = True
 
 # Global variable to hold last annotated frame
 annotated_frame: Optional[np.ndarray[Any, np.dtype[Any]]] = None
@@ -85,31 +85,50 @@ def annotate_body(annotated_image,body):
     right_ankle = body.parts[BodyParts.RIGHT_LEG].ankle
 
     # Draw the smoothed landmarks
-    cv2.line(annotated_image, (left_shoulder.x, left_shoulder.y), (left_elbow.x, left_elbow.y), (255, 0, 0), 2)
-    cv2.line(annotated_image, (left_elbow.x, left_elbow.y), (left_wrist.x, left_wrist.y), (255, 0, 0), 2)
-    cv2.line(annotated_image, (right_shoulder.x, right_shoulder.y), (right_elbow.x, right_elbow.y), (0, 255, 0), 2)
-    cv2.line(annotated_image, (right_elbow.x, right_elbow.y), (right_wrist.x, right_wrist.y), (0, 255, 0), 2)
-    cv2.line(annotated_image, (left_hip.x, left_hip.y), (left_knee.x, left_knee.y), (0, 0, 255), 2)
-    cv2.line(annotated_image, (left_knee.x, left_knee.y), (left_ankle.x, left_ankle.y), (0, 0, 255), 2)
-    cv2.line(annotated_image, (right_hip.x, right_hip.y), (right_knee.x, right_knee.y), (255, 255, 0), 2)
-    cv2.line(annotated_image, (right_knee.x, right_knee.y), (right_ankle.x, right_ankle.y), (255, 255, 0), 2)
-    cv2.line(annotated_image, (left_shoulder.x, left_shoulder.y), (left_hip.x, left_hip.y), (0, 255, 255), 2)
-    cv2.line(annotated_image, (right_shoulder.x, right_shoulder.y), (right_hip.x, right_hip.y), (0, 255, 255), 2)
-    cv2.line(annotated_image, (left_shoulder.x, left_shoulder.y), (right_shoulder.x, right_shoulder.y), (255, 0, 255), 2)
-    cv2.line(annotated_image, (left_hip.x, left_hip.y), (right_hip.x, right_hip.y), (255, 0, 255), 2)
-    cv2.circle(annotated_image, (nose.x, nose.y), 5, (0, 255, 255), -1)
-    cv2.circle(annotated_image, (left_eye.x, left_eye.y), 5, (255, 0, 255), -1)
-    cv2.circle(annotated_image, (right_eye.x, right_eye.y), 5, (255, 0, 255), -1)
+    if only_skeletons:
+        # draw the skeletons in gray-white
+        skeleton_color = (200, 200, 200)
+        cv2.line(annotated_image, (left_shoulder.x, left_shoulder.y), (left_elbow.x, left_elbow.y), skeleton_color, 2)
+        cv2.line(annotated_image, (left_elbow.x, left_elbow.y), (left_wrist.x, left_wrist.y), skeleton_color, 2)
+        cv2.line(annotated_image, (right_shoulder.x, right_shoulder.y), (right_elbow.x, right_elbow.y), skeleton_color, 2)
+        cv2.line(annotated_image, (right_elbow.x, right_elbow.y), (right_wrist.x, right_wrist.y), skeleton_color, 2)
+        cv2.line(annotated_image, (left_hip.x, left_hip.y), (left_knee.x, left_knee.y), skeleton_color, 2)
+        cv2.line(annotated_image, (left_knee.x, left_knee.y), (left_ankle.x, left_ankle.y), skeleton_color, 2)
+        cv2.line(annotated_image, (right_hip.x, right_hip.y), (right_knee.x, right_knee.y), skeleton_color, 2)
+        cv2.line(annotated_image, (right_knee.x, right_knee.y), (right_ankle.x, right_ankle.y), skeleton_color, 2)
+        cv2.line(annotated_image, (left_shoulder.x, left_shoulder.y), (left_hip.x, left_hip.y), skeleton_color, 2)
+        cv2.line(annotated_image, (right_shoulder.x, right_shoulder.y), (right_hip.x, right_hip.y), skeleton_color, 2)
+        cv2.line(annotated_image, (left_shoulder.x, left_shoulder.y), (right_shoulder.x, right_shoulder.y), skeleton_color, 2)
+        cv2.line(annotated_image, (left_hip.x, left_hip.y), (right_hip.x, right_hip.y), skeleton_color, 2)
+        cv2.circle(annotated_image, (nose.x, nose.y), 5, skeleton_color, -1)
+        cv2.circle(annotated_image, (left_eye.x, left_eye.y), 5, skeleton_color, -1)
+        cv2.circle(annotated_image, (right_eye.x, right_eye.y), 5, skeleton_color, -1)
+    else:
+        cv2.line(annotated_image, (left_shoulder.x, left_shoulder.y), (left_elbow.x, left_elbow.y), (255, 0, 0), 2)
+        cv2.line(annotated_image, (left_elbow.x, left_elbow.y), (left_wrist.x, left_wrist.y), (255, 0, 0), 2)
+        cv2.line(annotated_image, (right_shoulder.x, right_shoulder.y), (right_elbow.x, right_elbow.y), (0, 255, 0), 2)
+        cv2.line(annotated_image, (right_elbow.x, right_elbow.y), (right_wrist.x, right_wrist.y), (0, 255, 0), 2)
+        cv2.line(annotated_image, (left_hip.x, left_hip.y), (left_knee.x, left_knee.y), (0, 0, 255), 2)
+        cv2.line(annotated_image, (left_knee.x, left_knee.y), (left_ankle.x, left_ankle.y), (0, 0, 255), 2)
+        cv2.line(annotated_image, (right_hip.x, right_hip.y), (right_knee.x, right_knee.y), (255, 255, 0), 2)
+        cv2.line(annotated_image, (right_knee.x, right_knee.y), (right_ankle.x, right_ankle.y), (255, 255, 0), 2)
+        cv2.line(annotated_image, (left_shoulder.x, left_shoulder.y), (left_hip.x, left_hip.y), (0, 255, 255), 2)
+        cv2.line(annotated_image, (right_shoulder.x, right_shoulder.y), (right_hip.x, right_hip.y), (0, 255, 255), 2)
+        cv2.line(annotated_image, (left_shoulder.x, left_shoulder.y), (right_shoulder.x, right_shoulder.y), (255, 0, 255), 2)
+        cv2.line(annotated_image, (left_hip.x, left_hip.y), (right_hip.x, right_hip.y), (255, 0, 255), 2)
+        cv2.circle(annotated_image, (nose.x, nose.y), 5, (0, 255, 255), -1)
+        cv2.circle(annotated_image, (left_eye.x, left_eye.y), 5, (255, 0, 255), -1)
+        cv2.circle(annotated_image, (right_eye.x, right_eye.y), 5, (255, 0, 255), -1)
 
-    # Draw angles on the image
-    cv2.putText(annotated_image, f"{int(body.left_elbow_angle())}", (left_elbow.x + 10, left_elbow.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-    cv2.putText(annotated_image, f"{int(body.right_elbow_angle())}", (right_elbow.x - 45, right_elbow.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-    cv2.putText(annotated_image, f"{int(body.left_knee_angle())}", (left_knee.x + 10, left_knee.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-    cv2.putText(annotated_image, f"{int(body.right_knee_angle())}", (right_knee.x - 45, right_knee.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-    cv2.putText(annotated_image, f"{int(body.left_shoulder_angle())}", (left_shoulder.x + 10, left_shoulder.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-    cv2.putText(annotated_image, f"{int(body.right_shoulder_angle())}", (right_shoulder.x - 45, right_shoulder.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-    cv2.putText(annotated_image, f"{int(body.left_hip_angle())}", (left_hip.x + 10, left_hip.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
-    cv2.putText(annotated_image, f"{int(body.right_hip_angle())}", (right_hip.x - 45, right_hip.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+        # Draw angles on the image
+        cv2.putText(annotated_image, f"{int(body.left_elbow_angle())}", (left_elbow.x + 10, left_elbow.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(body.right_elbow_angle())}", (right_elbow.x - 45, right_elbow.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(body.left_knee_angle())}", (left_knee.x + 10, left_knee.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(body.right_knee_angle())}", (right_knee.x - 45, right_knee.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(body.left_shoulder_angle())}", (left_shoulder.x + 10, left_shoulder.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(body.right_shoulder_angle())}", (right_shoulder.x - 45, right_shoulder.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(body.left_hip_angle())}", (left_hip.x + 10, left_hip.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2),
+        cv2.putText(annotated_image, f"{int(body.right_hip_angle())}", (right_hip.x - 45, right_hip.y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
 def annotate_body_old(annotated_image, pose_landmarks, body):
     # ================================ #
@@ -360,9 +379,9 @@ def test_video():
 
 
 if __name__ == "__main__":
-    # run_live_stream()
+    run_live_stream()
     # run_on_video("/home/yuval/3_kids.webm")
-    run_image("poses/09_eagle.png")
+    # run_image("poses/09_eagle.png")
     # test_video()
 
 
